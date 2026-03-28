@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ผจญภัยแดนโค้ด — เรียนโค้ดฟรี สนุกเหมือนเล่นเกม</title>
+<meta name="description" content="แพลตฟอร์มสอนเขียนโค้ดฟรีภาษาไทย ผ่านเกมผจญภัย 270+ ด่าน ครอบคลุม 6 ภาษา ได้ทักษะจริง พร้อมใบรับรอง">
+<meta property="og:title" content="ผจญภัยแดนโค้ด — เรียนโค้ดฟรี สนุกเหมือนเล่นเกม">
+<meta property="og:description" content="แพลตฟอร์มสอนเขียนโค้ดฟรี 6 ภาษา ผ่านเกมผจญภัย 270+ ด่าน">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700;800;900&family=Fira+Code:wght@400;600&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-dark: #0f0e17;
+  --bg-card: #1a1932;
+  --bg-card2: #232146;
+  --accent: #ff6b6b;
+  --accent2: #4ecdc4;
+  --accent3: #ffe66d;
+  --accent4: #a855f7;
+  --text: #e0e0e0;
+  --text2: #a0a0a0;
+  --glow-red: rgba(255,107,107,0.3);
+  --glow-teal: rgba(78,205,196,0.3);
+  --glow-yellow: rgba(255,230,109,0.3);
+  --glow-purple: rgba(168,85,247,0.3);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans Thai', 'Inter', sans-serif;
+  background: var(--bg-dark);
+  color: var(--text);
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+
+/* ========== PARTICLES ========== */
+#particles-canvas {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
+}
+
+/* ========== NAVBAR ========== */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(15,14,23,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(78,205,196,0.1);
+  transition: all 0.3s;
+}
+.navbar.scrolled { background: rgba(15,14,23,0.95); box-shadow: 0 4px 30px rgba(0,0,0,0.3); }
+.nav-logo {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-size: 1.3rem; font-weight: 800; color: var(--text); text-decoration: none;
+}
+.nav-logo .logo-text { background: linear-gradient(135deg, var(--accent), var(--accent4)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { color: var(--text2); text-decoration: none; font-size: 0.95rem; font-weight: 600; transition: color 0.3s; }
+.nav-links a:hover { color: var(--accent2); }
+.nav-cta {
+  padding: 0.6rem 1.5rem;
+  background: linear-gradient(135deg, var(--accent), #ff4757);
+  color: white; border: none; border-radius: 50px;
+  font-family: inherit; font-size: 0.95rem; font-weight: 700;
+  cursor: pointer; text-decoration: none;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--glow-red); }
+
+/* ========== HERO ========== */
+.hero {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 8rem 2rem 4rem;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  background: rgba(78,205,196,0.1); border: 1px solid rgba(78,205,196,0.3);
+  border-radius: 50px; font-size: 0.85rem; font-weight: 600; color: var(--accent2);
+  margin-bottom: 1.5rem; animation: fadeInUp 0.8s ease;
+}
+.hero-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent2); animation: pulse 2s infinite; }
+.hero h1 {
+  font-size: clamp(2.5rem, 6vw, 4.2rem); font-weight: 900; line-height: 1.2;
+  margin-bottom: 1.2rem; animation: fadeInUp 0.8s ease 0.1s both;
+}
+.hero h1 .highlight {
+  background: linear-gradient(135deg, var(--accent), var(--accent3), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-size: 200% 200%; animation: gradientShift 4s ease infinite;
+}
+.hero p {
+  font-size: clamp(1rem, 2.5vw, 1.25rem); color: var(--text2);
+  max-width: 650px; margin-bottom: 2.5rem; animation: fadeInUp 0.8s ease 0.2s both;
+}
+.hero-buttons {
+  display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+  animation: fadeInUp 0.8s ease 0.3s both;
+}
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 1rem 2.2rem;
+  background: linear-gradient(135deg, var(--accent), #ff4757);
+  color: white; border: none; border-radius: 60px;
+  font-family: inherit; font-size: 1.1rem; font-weight: 700;
+  cursor: pointer; text-decoration: none; transition: all 0.3s;
+  box-shadow: 0 4px 20px var(--glow-red);
+}
+.btn-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 35px var(--glow-red); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 1rem 2.2rem;
+  background: rgba(78,205,196,0.1); border: 2px solid rgba(78,205,196,0.4);
+  color: var(--accent2); border-radius: 60px;
+  font-family: inherit; font-size: 1.1rem; font-weight: 700;
+  cursor: pointer; text-decoration: none; transition: all 0.3s;
+}
+.btn-secondary:hover { background: rgba(78,205,196,0.2); transform: translateY(-3px); box-shadow: 0 8px 25px var(--glow-teal); }
+.hero-stats {
+  display: flex; gap: 3rem; margin-top: 4rem;
+  animation: fadeInUp 0.8s ease 0.5s both;
+}
+.stat { text-align: center; }
+.stat-num { font-size: 2rem; font-weight: 900; color: var(--accent3); }
+.stat-label { font-size: 0.85rem; color: var(--text2); }
+
+/* ========== SECTIONS ========== */
+section { position: relative; z-index: 1; padding: 6rem 2rem; }
+.section-header { text-align: center; margin-bottom: 4rem; }
+.section-header .tag {
+  display: inline-block; padding: 0.4rem 1rem;
+  background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 50px; font-size: 0.8rem; font-weight: 700;
+  color: var(--accent4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;
+}
+.section-header h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 0.8rem; }
+.section-header p { color: var(--text2); max-width: 600px; margin: 0 auto; font-size: 1.05rem; }
+
+/* ========== QUEST STRUCTURE ========== */
+.quest-structure {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem; max-width: 1100px; margin: 0 auto;
+}
+.quest-card {
+  background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px; padding: 2rem; transition: all 0.4s; position: relative; overflow: hidden;
+}
+.quest-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  border-radius: 20px 20px 0 0;
+}
+.quest-card:nth-child(1)::before { background: linear-gradient(90deg, var(--accent2), #38b2ac); }
+.quest-card:nth-child(2)::before { background: linear-gradient(90deg, var(--accent), #ff4757); }
+.quest-card:nth-child(3)::before { background: linear-gradient(90deg, var(--accent4), #9f7aea); }
+.quest-card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.12); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+.quest-card .icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.quest-card h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+.quest-card p { color: var(--text2); font-size: 0.95rem; }
+
+/* ========== LANGUAGES ========== */
+.lang-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem; max-width: 1200px; margin: 0 auto;
+}
+.lang-card {
+  background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px; padding: 2rem; text-align: center;
+  transition: all 0.4s; position: relative; cursor: default;
+}
+.lang-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+.lang-card .lang-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+.lang-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.3rem; }
+.lang-card .levels { color: var(--accent3); font-weight: 600; font-size: 0.9rem; }
+.lang-card .desc { color: var(--text2); font-size: 0.85rem; margin-top: 0.5rem; }
+.lang-badge {
+  display: inline-block; padding: 0.3rem 0.8rem; border-radius: 50px;
+  font-size: 0.75rem; font-weight: 700; margin-top: 0.8rem;
+}
+.badge-ready { background: rgba(78,205,196,0.15); color: var(--accent2); border: 1px solid rgba(78,205,196,0.3); }
+.badge-soon { background: rgba(255,230,109,0.1); color: var(--accent3); border: 1px solid rgba(255,230,109,0.2); }
+.badge-later { background: rgba(160,160,160,0.1); color: var(--text2); border: 1px solid rgba(160,160,160,0.2); }
+.lang-card.ready { border-color: rgba(78,205,196,0.3); cursor: pointer; }
+.lang-card.ready:hover { border-color: var(--accent2); box-shadow: 0 20px 40px var(--glow-teal); }
+
+/* ========== GAME FORMATS ========== */
+.formats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.2rem; max-width: 1100px; margin: 0 auto;
+}
+.format-item {
+  display: flex; align-items: flex-start; gap: 1rem;
+  background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 16px; padding: 1.5rem; transition: all 0.3s;
+}
+.format-item:hover { border-color: rgba(255,255,255,0.1); background: var(--bg-card2); }
+.format-item .fmt-icon { font-size: 2rem; flex-shrink: 0; }
+.format-item h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.2rem; }
+.format-item p { color: var(--text2); font-size: 0.85rem; }
+
+/* ========== HOW IT WORKS ========== */
+.steps {
+  display: flex; gap: 2rem; max-width: 1000px; margin: 0 auto;
+  flex-wrap: wrap; justify-content: center;
+}
+.step { flex: 1; min-width: 200px; max-width: 240px; text-align: center; position: relative; }
+.step-num {
+  width: 60px; height: 60px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1rem; border-radius: 50%;
+  font-size: 1.5rem; font-weight: 900; color: white;
+}
+.step:nth-child(1) .step-num { background: linear-gradient(135deg, var(--accent), #ff4757); box-shadow: 0 4px 15px var(--glow-red); }
+.step:nth-child(2) .step-num { background: linear-gradient(135deg, var(--accent2), #38b2ac); box-shadow: 0 4px 15px var(--glow-teal); }
+.step:nth-child(3) .step-num { background: linear-gradient(135deg, var(--accent3), #f0c040); box-shadow: 0 4px 15px var(--glow-yellow); }
+.step:nth-child(4) .step-num { background: linear-gradient(135deg, var(--accent4), #9f7aea); box-shadow: 0 4px 15px var(--glow-purple); }
+.step h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.3rem; }
+.step p { color: var(--text2); font-size: 0.85rem; }
+
+/* ========== CERTIFICATES ========== */
+.cert-tiers {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem; max-width: 1000px; margin: 0 auto;
+}
+.cert-tier {
+  background: var(--bg-card); border-radius: 20px; padding: 2rem;
+  text-align: center; border: 1px solid rgba(255,255,255,0.06); transition: all 0.4s;
+}
+.cert-tier:hover { transform: translateY(-5px); }
+.cert-tier .tier-icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
+.cert-tier h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+.cert-tier p { color: var(--text2); font-size: 0.85rem; }
+.cert-tier:nth-child(1) { border-color: rgba(205,127,50,0.3); }
+.cert-tier:nth-child(2) { border-color: rgba(192,192,192,0.3); }
+.cert-tier:nth-child(3) { border-color: rgba(255,215,0,0.3); }
+.cert-tier:nth-child(4) { border-color: rgba(168,85,247,0.3); }
+
+/* ========== CTA ========== */
+.cta-section {
+  text-align: center; padding: 6rem 2rem; position: relative; z-index: 1;
+  background: linear-gradient(180deg, transparent, rgba(78,205,196,0.03), transparent);
+}
+.cta-section h2 { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; margin-bottom: 1rem; }
+.cta-section p { color: var(--text2); font-size: 1.1rem; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+
+/* ========== FOOTER ========== */
+.footer {
+  position: relative; z-index: 1; padding: 3rem 2rem;
+  border-top: 1px solid rgba(255,255,255,0.06); text-align: center;
+}
+.footer p { color: var(--text2); font-size: 0.85rem; }
+.footer a { color: var(--accent2); text-decoration: none; }
+.footer-links { display: flex; gap: 2rem; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap; }
+.footer-links a { color: var(--text2); font-size: 0.85rem; transition: color 0.3s; }
+.footer-links a:hover { color: var(--accent2); }
+
+/* ========== ANIMATIONS ========== */
+@keyframes fadeInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+@keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(1.5); } }
+@keyframes gradientShift { 0%,100% { background-position:0% 50%; } 50% { background-position:100% 50%; } }
+
+.reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.16,1,0.3,1); }
+.reveal.active { opacity: 1; transform: translateY(0); }
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .navbar { padding: 0.8rem 1rem; }
+  .hero { padding: 7rem 1.2rem 3rem; }
+  .hero-stats { gap: 1.5rem; }
+  .stat-num { font-size: 1.5rem; }
+  section { padding: 4rem 1.2rem; }
+  .steps { gap: 1.5rem; }
+  .step { min-width: 150px; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <a href="#" class="nav-logo">
+    <span>&#x2694;&#xFE0F;</span>
+    <span class="logo-text">ผจญภัยแดนโค้ด</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#languages">ภาษา</a></li>
+    <li><a href="#how-it-works">วิธีเล่น</a></li>
+    <li><a href="#certificates">ใบรับรอง</a></li>
+    <li><a href="#formats">รูปแบบเกม</a></li>
+    <li><a href="dashboard.html">📊 Dashboard</a></li>
+  </ul>
+  <button id="auth-btn" onclick="CodeQuestAuth.openModal()" style="background:linear-gradient(135deg,#ff6b6b,#a855f7);border:none;color:#fff;padding:8px 20px;border-radius:25px;font-family:'Prompt',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;">👤 เข้าสู่ระบบ</button>
+  <div id="user-info" style="display:none;align-items:center;gap:8px;color:#fff;font-family:'Prompt',sans-serif;font-size:0.85rem;"><span id="user-name"></span><button id="logout-btn" onclick="CodeQuestAuth.signOut()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#94a1b2;padding:4px 12px;border-radius:15px;font-family:'Prompt',sans-serif;font-size:0.75rem;cursor:pointer;">ออก</button></div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    4 ภาษาพร้อมเล่นแล้ว! Python, JS, HTML/CSS, SQL
+  </div>
+  <h1>
+    เรียนโค้ด<span class="highlight">ฟรี</span><br>
+    สนุกเหมือน<span class="highlight">เล่นเกม</span>
+  </h1>
+  <p>แพลตฟอร์มสอนเขียนโค้ดภาษาไทย ผ่านเกมผจญภัย 270+ ด่าน ครอบคลุม 6 ภาษา ตรวจทักษะจริง ไม่ใช่แค่ได้ output ถูก</p>
+  <div class="hero-buttons">
+    <a href="python_quest.html" class="btn-primary">&#x1F3AE; เริ่มผจญภัย Python</a>
+    <a href="#languages" class="btn-secondary">&#x1F4DA; ดูภาษาทั้งหมด</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">180</div><div class="stat-label">ด่านพร้อมเล่น</div></div>
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">ภาษาพร้อมเล่น</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">ฟรีตลอดกาล</div></div>
+  </div>
+</section>
+
+<!-- QUEST STRUCTURE -->
+<section id="quest-structure">
+  <div class="section-header reveal">
+    <div class="tag">Quest Structure</div>
+    <h2>ทุกด่านมี 3 ส่วน = ทักษะจริง</h2>
+    <p>ไม่ใช่แค่ดูวิดีโอแล้วจบ ทุกด่านต้องเขียนโค้ดจริง ตรวจสอบจริง</p>
+  </div>
+  <div class="quest-structure">
+    <div class="quest-card reveal">
+      <div class="icon">&#x1F4D6;</div>
+      <h3>บทเรียน (Tutorial)</h3>
+      <p>สอนคำสั่งใหม่ อธิบาย logic พร้อมตัวอย่างโค้ดและ output เข้าใจก่อนลงมือทำ</p>
+    </div>
+    <div class="quest-card reveal">
+      <div class="icon">&#x2694;&#xFE0F;</div>
+      <h3>ท้าทาย (Challenge)</h3>
+      <p>โจทย์ใหม่ที่ต่างจากตัวอย่าง ต้องคิดและประยุกต์เอง ห้าม copy วาง!</p>
+    </div>
+    <div class="quest-card reveal">
+      <div class="icon">&#x1F6AB;</div>
+      <h3>ตรวจทักษะ (Skill Check)</h3>
+      <p>ไม่ใช่แค่ได้ output ถูก ต้องใช้คำสั่งที่กำหนดจริงๆ ป้องกัน hardcode</p>
+    </div>
+  </div>
+</section>
+
+<!-- LANGUAGES -->
+<section id="languages">
+  <div class="section-header reveal">
+    <div class="tag">Languages</div>
+    <h2>6 ภาษา ครบทุกทักษะ</h2>
+    <p>จากพื้นฐานถึงขั้นสูง เตรียมพร้อมสู่สายอาชีพ</p>
+  </div>
+  <div class="lang-grid">
+    <div class="lang-card ready reveal" onclick="location.href='python_quest.html'">
+      <span class="lang-icon">&#x1F40D;</span>
+      <h3>Python</h3>
+      <div class="levels">50 ด่าน | 8 Zones</div>
+      <div class="desc">ภาษาแรกที่ควรเรียน ใช้ได้ทั้ง AI, Data, Web</div>
+      <span class="lang-badge badge-ready">&#x2705; พร้อมเล่น</span>
+    </div>
+    <div class="lang-card ready reveal" onclick="location.href='htmlcss_quest.html'">
+      <span class="lang-icon">&#x1F310;</span>
+      <h3>HTML / CSS</h3>
+      <div class="levels">40 ด่าน | 7 Zones</div>
+      <div class="desc">สร้างเว็บไซต์สวยๆ ตั้งแต่พื้นฐานถึง Responsive</div>
+      <span class="lang-badge badge-ready">&#x2705; พร้อมเล่น</span>
+    </div>
+    <div class="lang-card ready reveal" onclick="location.href='js_quest.html'">
+      <span class="lang-icon">&#x26A1;</span>
+      <h3>JavaScript</h3>
+      <div class="levels">50 ด่าน | 8 Zones</div>
+      <div class="desc">ภาษาของเว็บ ทำได้ทั้ง Frontend และ Backend</div>
+      <span class="lang-badge badge-ready">&#x2705; พร้อมเล่น</span>
+    </div>
+    <div class="lang-card reveal">
+      <span class="lang-icon">&#x2615;</span>
+      <h3>Java</h3>
+      <div class="levels">50 ด่าน | 8 Zones</div>
+      <div class="desc">ภาษาระดับองค์กร ใช้ทำ Android + Backend</div>
+      <span class="lang-badge badge-later">&#x1F4C5; กำลังพัฒนา</span>
+    </div>
+    <div class="lang-card ready reveal" onclick="location.href='sql_quest.html'">
+      <span class="lang-icon">&#x1F4BE;</span>
+      <h3>SQL</h3>
+      <div class="levels">40 ด่าน | 6 Zones</div>
+      <div class="desc">จัดการฐานข้อมูล ทักษะที่ทุกสายงาน IT ต้องมี</div>
+      <span class="lang-badge badge-ready">&#x2705; พร้อมเล่น</span>
+    </div>
+    <div class="lang-card reveal">
+      <span class="lang-icon">&#x2699;&#xFE0F;</span>
+      <h3>C / C++</h3>
+      <div class="levels">40 ด่าน | 7 Zones</div>
+      <div class="desc">เข้าใจ computer ระดับลึก พื้นฐานของทุกภาษา</div>
+      <span class="lang-badge badge-later">&#x1F4C5; กำลังพัฒนา</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div class="section-header reveal">
+    <div class="tag">How It Works</div>
+    <h2>เริ่มต้นง่ายๆ 4 ขั้นตอน</h2>
+  </div>
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num">1</div>
+      <h3>เลือกภาษา</h3>
+      <p>เริ่มจาก Python ที่ง่ายที่สุด</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">2</div>
+      <h3>อ่านบทเรียน</h3>
+      <p>เรียนรู้คำสั่งใหม่จากตัวอย่าง</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">3</div>
+      <h3>ทำโจทย์จริง</h3>
+      <p>เขียนโค้ดแก้โจทย์ใหม่ด้วยตัวเอง</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">4</div>
+      <h3>รับใบรับรอง</h3>
+      <p>จบครบ ได้ Certificate + QR Verify</p>
+    </div>
+  </div>
+</section>
+
+<!-- GAME FORMATS -->
+<section id="formats">
+  <div class="section-header reveal">
+    <div class="tag">Game Modes</div>
+    <h2>8 รูปแบบเกม ไม่มีเบื่อ</h2>
+    <p>ไม่ใช่แค่ผ่านด่าน มีหลายโหมดให้ท้าทายตัวเอง</p>
+  </div>
+  <div class="formats-grid">
+    <div class="format-item reveal"><div class="fmt-icon">&#x1F5FA;&#xFE0F;</div><div><h4>Quest Adventure</h4><p>ผจญภัยผ่านด่าน เรียนรู้ทีละเรื่อง</p></div></div>
+    <div class="format-item reveal"><div class="fmt-icon">&#x1F9E9;</div><div><h4>Puzzle Lab</h4><p>แก้ปริศนาโค้ด ใช้ Logic ขั้นเทพ</p></div></div>
+    <div class="format-item reveal"><div class="fmt-icon">&#x1F50D;</div><div><h4>Debug Detective</h4><p>หาบั๊กในโค้ด ฝึกทักษะ Debugging</p></div></div>
+    <div class="format-item reveal"><div class="fmt-icon">&#x23F1;&#xFE0F;</div><div><h4>Speed Code</h4><p>แข่งความเร็ว มีเวลาจำกัด</p></div></div>
+    <div class="format-item reveal"><div class="fmt-icon">&#x1F432;</div><div><h4>Boss Battle</h4><p>บอสประจำ Zone โจทย์รวมทุกทักษะ</p></div></div>
+    <div class="format-item reveal"><div class="fmt-icon">&#x1F3CC;&#xFE0F;</div><div><h4>Code Golf</h4><p>เขียนโค้ดให้สั้นที่สุด</p></div></div>
+    <div class="format-item reveal"><div class="fmt-icon">&#x1F91D;</div><div><h4>Pair Programming</h4><p>ร่วมมือกันเขียน 2 คน</p></div></div>
+    <div class="format-item reveal"><div class="fmt-icon">&#x1F3C6;</div><div><h4>Tournament</h4><p>แข่งขันรายสัปดาห์ ชิงอันดับ</p></div></div>
+  </div>
+</section>
+
+<!-- CERTIFICATES -->
+<section id="certificates">
+  <div class="section-header reveal">
+    <div class="tag">Certificates</div>
+    <h2>ใบรับรองจริง ตรวจสอบได้</h2>
+    <p>เมื่อจบ Quest ของแต่ละภาษา รับใบรับรองพร้อม QR Code ยืนยัน</p>
+  </div>
+  <div class="cert-tiers">
+    <div class="cert-tier reveal"><span class="tier-icon">&#x1F949;</span><h3>Bronze</h3><p>ผ่านทุกด่าน</p></div>
+    <div class="cert-tier reveal"><span class="tier-icon">&#x1F948;</span><h3>Silver</h3><p>ดาวรวม &#x2265; 60%</p></div>
+    <div class="cert-tier reveal"><span class="tier-icon">&#x1F947;</span><h3>Gold</h3><p>ดาวรวม &#x2265; 80%</p></div>
+    <div class="cert-tier reveal"><span class="tier-icon">&#x1F48E;</span><h3>Diamond</h3><p>ดาวรวม &#x2265; 95% + Speed Code</p></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2 class="reveal">พร้อมเริ่มผจญภัยแล้วหรือยัง?</h2>
+  <p class="reveal">เริ่มต้นกับ Python Quest 50 ด่าน ฟรี ไม่ต้องสมัคร!</p>
+  <a href="python_quest.html" class="btn-primary reveal" style="font-size:1.2rem; padding:1.1rem 2.5rem;">&#x1F680; เริ่มเลย — ฟรี!</a>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-links">
+    <a href="#">เกี่ยวกับเรา</a>
+    <a href="#">ติดต่อ</a>
+    <a href="#">นโยบายความเป็นส่วนตัว</a>
+  </div>
+  <p>&copy; 2026 ผจญภัยแดนโค้ด.online — สร้างโดยคนไทย เพื่อคนไทย &#x1F1F9;&#x1F1ED;</p>
+  <p style="margin-top:0.5rem; font-size:0.8rem;">เรียนโค้ดฟรี สนุกเหมือนเล่นเกม ได้ทักษะจริง</p>
+</footer>
+
+<script>
+// ========== PARTICLES ==========
+const canvas = document.getElementById('particles-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+const PARTICLE_COUNT = 60;
+
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 2 + 0.5;
+    this.speedX = (Math.random() - 0.5) * 0.3;
+    this.speedY = (Math.random() - 0.5) * 0.3;
+    this.opacity = Math.random() * 0.4 + 0.1;
+    const colors = ['255,107,107', '78,205,196', '255,230,109', '168,85,247'];
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+  }
+  update() {
+    this.x += this.speedX; this.y += this.speedY;
+    if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+  }
+  draw() {
+    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${this.color}, ${this.opacity})`; ctx.fill();
+  }
+}
+
+for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(78,205,196, ${0.08 * (1 - dist / 120)})`;
+        ctx.lineWidth = 0.5; ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ========== NAVBAR SCROLL ==========
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// ========== REVEAL ON SCROLL ==========
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('active'), i * 80);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+<script src="auth.js"></script>
+</body>
+</html>

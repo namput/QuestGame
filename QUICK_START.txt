@@ -1,0 +1,69 @@
+==========================================
+HTML/CSS QUEST 40 LEVELS - QUICK START
+==========================================
+
+FILE: htmlcss_quest.html (53 KB)
+
+WHAT TO DO:
+1. Open htmlcss_quest.html in any web browser
+2. Read the tutorial (left side)
+3. Write HTML/CSS code in the editor
+4. Click "Preview" to see it rendered
+5. Click "Check" to validate your solution
+6. Progress through all 40 levels!
+
+GAME FEATURES:
+- 40 progressive levels (7 zones)
+- XP/Level progression system
+- 3-tier hint system (Free, -10 XP, -25 XP)
+- Live code editor with iframe preview
+- Auto-save to browser storage
+- Dark theme UI with animations
+- Multiple choice zone reviews
+- All content in Thai language
+
+ZONE BREAKDOWN:
+Zone 1 (L1-6):     HTML Basics (headings, links, images, lists, text)
+Zone 2 (L7-12):    HTML Forms & Tables (input, forms, tables)
+Zone 3 (L13-18):   CSS Basics (colors, fonts, spacing, borders)
+Zone 4 (L19-24):   CSS Layout (position, flexbox, grid)
+Zone 5 (L25-30):   Responsive Design (media queries, viewport, units)
+Zone 6 (L31-36):   Advanced CSS (animation, transform, pseudo-elements)
+Zone 7 (L37-40):   Projects & Boss (card, nav, hero, final challenge)
+
+SCORING:
+- Base XP: 100 per level
+- Max Total: 4000 XP (40 × 100)
+- Player Level = Floor(Total XP / 400)
+
+CONTROLS:
+- Stage Map: Click level badges to navigate (locked until completed)
+- Code Editor: Write HTML/CSS
+- Preview: Renders code in iframe
+- Check: Validates code and DOM
+- Reset: Clear code and hints
+- Hints: Show tips (Hint 1 free, others cost XP)
+
+REQUIREMENTS:
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+- JavaScript enabled
+- No internet connection needed
+- Works on desktop and mobile
+
+TIPS:
+1. Read the tutorial carefully for each level
+2. Look at the code example to understand concepts
+3. Use hints before getting stuck
+4. Click Preview frequently to see your work
+5. Complete challenges to unlock next levels
+6. Check the status messages for guidance
+
+TROUBLESHOOTING:
+- If preview is blank, check browser console for errors
+- If check fails, read error message and validate code
+- If stuck, use hints (you can spend XP)
+- Data saves automatically to browser storage
+
+READY? Open htmlcss_quest.html and start your quest!
+
+==========================================

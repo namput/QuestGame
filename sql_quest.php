@@ -622,6 +622,6 @@ function goHome() {
 
 window.onload = initSQL;
 </script>
-<script src="auth.js"></script>
+<script src="/auth.js"></script>
 </body>
 </html>

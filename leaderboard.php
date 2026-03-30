@@ -7,7 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
 <!-- auth helper (for currentUserId) -->
-<script src="auth.js"></script>
+<script src="/auth.js"></script>
+<link rel="stylesheet" href="/includes/navbar.css">
 <style>
 :root {
   --bg: #0f0e17;
@@ -361,10 +362,7 @@ body {
 <canvas id="particles-canvas"></canvas>
 
 <!-- NAV -->
-<nav class="nav">
-  <div class="nav-logo">🏆 Leaderboard</div>
-  <a href="index.php" class="nav-back">← กลับหน้าหลัก</a>
-</nav>
+<?php $activePage = 'leaderboard'; include __DIR__ . '/includes/navbar.php'; ?>
 
 <!-- PAGE -->
 <div class="page">

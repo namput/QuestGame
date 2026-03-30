@@ -3069,6 +3069,6 @@ function resetGame() {
   location.reload();
 }
 </script>
-<script src="auth.js"></script>
+<script src="/auth.js"></script>
 </body>
 </html>

@@ -6,6 +6,7 @@
 <title>🏰 Dashboard - ผจญภัยแดนโค้ด</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/includes/navbar.css">
 <style>
 :root {
   --bg-dark: #0f0e17;
@@ -217,14 +218,7 @@ body {
 
 <div class="container">
   <!-- Top Nav -->
-  <nav class="top-nav">
-    <a href="index.php" class="logo">🏰 ผจญภัยแดนโค้ด</a>
-    <div class="nav-links">
-      <a href="index.php">หน้าหลัก</a>
-      <a href="dashboard.php" style="color:var(--accent2)">Dashboard</a>
-      <button class="logout-btn" id="nav-logout" onclick="handleLogout()" style="display:none">ออกจากระบบ</button>
-    </div>
-  </nav>
+  <?php $activePage = 'dashboard'; include __DIR__ . '/includes/navbar.php'; ?>
 
   <!-- Content: changes based on login state -->
   <div id="dashboard-content">
@@ -367,7 +361,7 @@ body {
   </div>
 </div>
 
-<script src="auth.js"></script>
+<script src="/auth.js"></script>
 <script>
 // Particles
 (function() {

@@ -6,7 +6,7 @@
 <title>🤖 AI Quest — ผจญภัยแดนโค้ด</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
-<script src="auth.js"></script>
+<script src="/auth.js"></script>
 <script src="codequest-engine.js"></script>
 <style>
 :root {

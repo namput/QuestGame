@@ -3426,6 +3426,6 @@ document.addEventListener('DOMContentLoaded', () => {
 createParticles();
 initPyodide();
 </script>
-<script src="auth.js"></script>
+<script src="/auth.js"></script>
 </body>
 </html>

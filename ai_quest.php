@@ -287,11 +287,18 @@ textarea#code-editor {
 
 <!-- NAV -->
 <nav class="nav">
-  <div class="nav-logo">🤖 AI Quest</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="/index.php" class="nav-btn" style="font-size:0.78rem;padding:5px 12px">← กลับ</a>
+    <div class="nav-logo">🤖 AI Quest</div>
+  </div>
   <div class="nav-right">
     <span class="nav-progress-text" id="nav-progress">ด่าน <span id="cur-level">1</span>/28</span>
     <span class="nav-xp" id="nav-xp">0 XP</span>
-    <a href="index.php" class="nav-btn">← หน้าหลัก</a>
+    <button id="auth-btn" onclick="CodeQuestAuth.openModal()" class="nav-btn">👤 เข้าสู่ระบบ</button>
+    <div id="user-info" style="display:none;align-items:center;gap:8px">
+      <span id="user-name" style="font-size:0.82rem;color:#fff;font-family:'Prompt',sans-serif;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+      <button id="logout-btn" onclick="CodeQuestAuth.signOut()" class="nav-btn" style="font-size:0.75rem;padding:4px 10px;color:#94a1b2">ออก</button>
+    </div>
   </div>
 </nav>
 

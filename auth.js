@@ -105,8 +105,17 @@ const CodeQuestAuth = {
     if (this.token) opts.headers['Authorization'] = `Bearer ${this.token}`;
     if (body) opts.body = JSON.stringify(body);
 
-    const res  = await fetch(API_BASE + path, opts);
-    return res.json();
+    let res;
+    try {
+      res = await fetch(API_BASE + path, opts);
+    } catch (e) {
+      throw new Error('ไม่สามารถเชื่อมต่อ server ได้ (' + e.message + ')');
+    }
+    const json = await res.json().catch(() => null);
+    if (json === null) {
+      throw new Error(`API error: HTTP ${res.status} — กรุณาตรวจสอบว่าอัพโหลด PHP files แล้ว`);
+    }
+    return json;
   },
 
   // ─── UI helpers ─────────────────────────────────────────────

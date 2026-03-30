@@ -295,6 +295,7 @@ section { position: relative; z-index: 1; padding: 6rem 2rem; }
     <span class="logo-text">ผจญภัยแดนโค้ด</span>
   </a>
   <ul class="nav-links">
+    <li><a href="leaderboard.html">🏆 Leaderboard</a></li>
     <li><a href="#languages">ภาษา</a></li>
     <li><a href="#how-it-works">วิธีเล่น</a></li>
     <li><a href="#certificates">ใบรับรอง</a></li>
@@ -396,6 +397,13 @@ section { position: relative; z-index: 1; padding: 6rem 2rem; }
       <div class="desc">จัดการฐานข้อมูล ทักษะที่ทุกสายงาน IT ต้องมี</div>
       <span class="lang-badge badge-ready">&#x2705; พร้อมเล่น</span>
     </div>
+    <div class="lang-card ready reveal" onclick="location.href='ai_quest.html'" style="border-color:rgba(168,85,247,0.4); background: linear-gradient(145deg, #1a1932, #1e1040);">
+      <span class="lang-icon">🤖</span>
+      <h3>AI Quest <span style="font-size:.7rem;background:linear-gradient(135deg,#a855f7,#4ecdc4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">NEW</span></h3>
+      <div class="levels">40 ด่าน | 7 Zones</div>
+      <div class="desc">เรียนรู้ AI จาก concept → NumPy → pandas → ML → สร้าง AI จริง</div>
+      <span class="lang-badge" style="background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.4);">✅ พร้อมเล่น</span>
+    </div>
     <div class="lang-card reveal">
       <span class="lang-icon">&#x2699;&#xFE0F;</span>
       <h3>C / C++</h3>
@@ -473,8 +481,12 @@ section { position: relative; z-index: 1; padding: 6rem 2rem; }
 <!-- CTA -->
 <div class="cta-section">
   <h2 class="reveal">พร้อมเริ่มผจญภัยแล้วหรือยัง?</h2>
-  <p class="reveal">เริ่มต้นกับ Python Quest 50 ด่าน ฟรี ไม่ต้องสมัคร!</p>
-  <a href="python_quest.html" class="btn-primary reveal" style="font-size:1.2rem; padding:1.1rem 2.5rem;">&#x1F680; เริ่มเลย — ฟรี!</a>
+  <p class="reveal">เลือกวิชาที่สนใจ เริ่มเล่นได้ทันที ฟรี ไม่ต้องสมัคร!</p>
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;" class="reveal">
+    <a href="python_quest.html" class="btn-primary" style="font-size:1.1rem;">🐍 Python</a>
+    <a href="ai_quest.html" class="btn-primary" style="font-size:1.1rem;background:linear-gradient(135deg,#7c3aed,#4ecdc4);">🤖 AI Quest</a>
+    <a href="leaderboard.html" class="btn-secondary" style="font-size:1.1rem;">🏆 Leaderboard</a>
+  </div>
 </div>
 
 <!-- FOOTER -->

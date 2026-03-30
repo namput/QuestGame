@@ -1,0 +1,10 @@
+# api/ folder — ป้องกัน config.php เข้าโดยตรงไม่ได้
+<Files "config.php">
+    Require all denied
+</Files>
+
+# CORS headers สำหรับ PHP API (backup — PHP ก็ set เองอยู่แล้ว)
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+</IfModule>

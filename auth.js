@@ -1,22 +1,12 @@
 // ============================================================
-// CodeQuest Auth & Progress System
-// ผจญภัยแดนโค้ด - ระบบสมาชิกและเก็บ Progress
+// CodeQuest Auth & Progress System v2 — PHP Backend
+// ผจญภัยแดนโค้ด
 // ============================================================
-// ใช้ร่วมกับ Supabase - ต้องตั้งค่า SUPABASE_URL และ SUPABASE_ANON_KEY
+// ทำงานร่วมกับ api/auth.php, api/progress.php
+// ไม่ต้องการ Supabase
 // ============================================================
 
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';       // ← ใส่ URL ของ Supabase project
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // ← ใส่ anon/public key
-
-// Initialize Supabase client
-let supabase = null;
-
-function initSupabase() {
-  if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-  return supabase;
-}
+const API_BASE = './api';   // เปลี่ยนเป็น '/api' ถ้า HTML อยู่ที่ root
 
 // ============================================================
 // AUTH FUNCTIONS
@@ -24,171 +14,155 @@ function initSupabase() {
 
 const CodeQuestAuth = {
   currentUser: null,
-  profile: null,
+  profile:     null,
+  token:       null,
 
-  // เช็คว่า login อยู่ไหม
+  // เช็คว่า login อยู่ไหม (เรียกตอนโหลดหน้า)
   async init() {
-    if (!supabase) initSupabase();
-    if (!supabase) return null;
-
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      this.currentUser = session.user;
-      await this.loadProfile();
+    this.token = localStorage.getItem('cq_token');
+    if (!this.token) {
+      this.updateUI();
+      return null;
     }
-
-    // Listen for auth changes
-    supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        this.currentUser = session.user;
-        await this.loadProfile();
-        this.updateUI();
-        if (typeof onAuthChange === 'function') onAuthChange('SIGNED_IN');
-      } else if (event === 'SIGNED_OUT') {
-        this.currentUser = null;
-        this.profile = null;
-        this.updateUI();
-        if (typeof onAuthChange === 'function') onAuthChange('SIGNED_OUT');
-      }
-    });
-
-    this.updateUI();
-    return this.currentUser;
+    try {
+      const res  = await this._api('GET', '/auth.php?action=me');
+      if (res.error) { this._clearSession(); return null; }
+      this.currentUser = res.user;
+      this.profile     = res.user;
+      this.updateUI();
+      return this.currentUser;
+    } catch {
+      this._clearSession();
+      return null;
+    }
   },
 
-  // โหลดข้อมูล profile
-  async loadProfile() {
-    if (!this.currentUser) return;
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', this.currentUser.id)
-      .single();
-    this.profile = data;
-  },
-
-  // สมัครสมาชิกด้วย Email
+  // สมัครสมาชิก
   async signUp(email, password, displayName) {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { display_name: displayName }
-      }
+    const res = await this._api('POST', '/auth.php?action=register', {
+      email, password, display_name: displayName
     });
-    if (error) throw error;
-    return data;
+    if (res.error) throw new Error(res.error);
+    this._setSession(res.token, res.user);
+    return res;
   },
 
-  // Login ด้วย Email
+  // เข้าสู่ระบบ
   async signIn(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
+    const res = await this._api('POST', '/auth.php?action=login', {
+      email, password
     });
-    if (error) throw error;
-    return data;
+    if (res.error) throw new Error(res.error);
+    this._setSession(res.token, res.user);
+    return res;
   },
 
-  // Login ด้วย Google
-  async signInWithGoogle() {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.href
-      }
-    });
-    if (error) throw error;
-    return data;
-  },
-
-  // Login ด้วย GitHub
-  async signInWithGitHub() {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
-      options: {
-        redirectTo: window.location.href
-      }
-    });
-    if (error) throw error;
-    return data;
-  },
-
-  // Logout
+  // ออกจากระบบ
   async signOut() {
-    await supabase.auth.signOut();
-    this.currentUser = null;
-    this.profile = null;
+    await this._api('POST', '/auth.php?action=logout').catch(() => {});
+    this._clearSession();
     this.updateUI();
   },
 
-  // อัพเดท display name
-  async updateDisplayName(name) {
-    if (!this.currentUser) return;
-    await supabase
-      .from('profiles')
-      .update({ display_name: name })
-      .eq('id', this.currentUser.id);
-    this.profile.display_name = name;
+  // อัปเดตโปรไฟล์
+  async updateProfile(data) {
+    const res = await this._api('POST', '/auth.php?action=update_profile', data);
+    if (res.error) throw new Error(res.error);
+    this.profile = { ...this.profile, ...data };
+    this.currentUser = this.profile;
+    this.updateUI();
+    return res;
   },
 
-  // แสดง/ซ่อน UI ตามสถานะ login
+  // ─── Session helpers ────────────────────────────────────────
+
+  _setSession(token, user) {
+    this.token       = token;
+    this.currentUser = user;
+    this.profile     = user;
+    localStorage.setItem('cq_token', token);
+    this.updateUI();
+
+    if (typeof onAuthChange === 'function') onAuthChange('SIGNED_IN');
+  },
+
+  _clearSession() {
+    this.token       = null;
+    this.currentUser = null;
+    this.profile     = null;
+    localStorage.removeItem('cq_token');
+    if (typeof onAuthChange === 'function') onAuthChange('SIGNED_OUT');
+  },
+
+  // ─── HTTP helper ────────────────────────────────────────────
+
+  async _api(method, path, body) {
+    const opts = {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    };
+    if (this.token) opts.headers['Authorization'] = `Bearer ${this.token}`;
+    if (body) opts.body = JSON.stringify(body);
+
+    const res  = await fetch(API_BASE + path, opts);
+    return res.json();
+  },
+
+  // ─── UI helpers ─────────────────────────────────────────────
+
   updateUI() {
-    const authBtn = document.getElementById('auth-btn');
+    const authBtn  = document.getElementById('auth-btn');
     const userInfo = document.getElementById('user-info');
     const userName = document.getElementById('user-name');
+    const syncBadge = document.getElementById('sync-badge');
 
-    if (this.currentUser && this.profile) {
-      if (authBtn) authBtn.style.display = 'none';
-      if (userInfo) userInfo.style.display = 'flex';
-      if (userName) userName.textContent = this.profile.display_name || this.currentUser.email;
+    if (this.currentUser) {
+      if (authBtn)   authBtn.style.display  = 'none';
+      if (userInfo)  userInfo.style.display = 'flex';
+      if (userName)  userName.textContent   = this.profile?.display_name || this.currentUser.email;
+      if (syncBadge) { syncBadge.className = 'sync-badge'; syncBadge.innerHTML = '☁️ Saved'; }
     } else {
-      if (authBtn) authBtn.style.display = 'inline-flex';
-      if (userInfo) userInfo.style.display = 'none';
+      if (authBtn)   authBtn.style.display  = 'inline-flex';
+      if (userInfo)  userInfo.style.display = 'none';
+      if (syncBadge) { syncBadge.className = 'sync-badge offline'; syncBadge.innerHTML = '💾 Local'; }
     }
   },
 
-  // สร้าง Auth Modal HTML
+  // ─── Modal ──────────────────────────────────────────────────
+
   createAuthModal() {
     if (document.getElementById('auth-modal')) return;
-
     const modal = document.createElement('div');
-    modal.id = 'auth-modal';
+    modal.id    = 'auth-modal';
     modal.innerHTML = `
       <div class="auth-overlay" onclick="CodeQuestAuth.closeModal()"></div>
       <div class="auth-box">
         <button class="auth-close" onclick="CodeQuestAuth.closeModal()">&times;</button>
         <div class="auth-logo">🏰 ผจญภัยแดนโค้ด</div>
+
         <div class="auth-tabs">
           <button class="auth-tab active" onclick="CodeQuestAuth.switchTab('login')">เข้าสู่ระบบ</button>
           <button class="auth-tab" onclick="CodeQuestAuth.switchTab('register')">สมัครสมาชิก</button>
         </div>
 
+        <!-- LOGIN -->
         <div id="auth-login-form" class="auth-form">
-          <div class="auth-social">
-            <button class="social-btn google" onclick="CodeQuestAuth.signInWithGoogle()">
-              <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-              Google
-            </button>
-            <button class="social-btn github" onclick="CodeQuestAuth.signInWithGitHub()">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-              GitHub
-            </button>
-          </div>
-          <div class="auth-divider"><span>หรือใช้อีเมล</span></div>
-          <input type="email" id="login-email" placeholder="อีเมล" class="auth-input">
+          <input type="email"    id="login-email"    placeholder="อีเมล"     class="auth-input">
           <input type="password" id="login-password" placeholder="รหัสผ่าน" class="auth-input">
           <button class="auth-submit" onclick="CodeQuestAuth.handleLogin()">เข้าสู่ระบบ</button>
           <div id="login-error" class="auth-error"></div>
         </div>
 
+        <!-- REGISTER -->
         <div id="auth-register-form" class="auth-form" style="display:none">
-          <input type="text" id="reg-name" placeholder="ชื่อที่แสดง" class="auth-input">
-          <input type="email" id="reg-email" placeholder="อีเมล" class="auth-input">
-          <input type="password" id="reg-password" placeholder="รหัสผ่าน (อย่างน้อย 6 ตัว)" class="auth-input">
-          <input type="password" id="reg-password2" placeholder="ยืนยันรหัสผ่าน" class="auth-input">
+          <input type="text"     id="reg-name"      placeholder="ชื่อที่แสดง"              class="auth-input">
+          <input type="email"    id="reg-email"     placeholder="อีเมล"                    class="auth-input">
+          <input type="text"     id="reg-school"    placeholder="โรงเรียน / มหาวิทยาลัย (ไม่บังคับ)" class="auth-input">
+          <input type="password" id="reg-password"  placeholder="รหัสผ่าน (อย่างน้อย 6 ตัว)" class="auth-input">
+          <input type="password" id="reg-password2" placeholder="ยืนยันรหัสผ่าน"           class="auth-input">
           <button class="auth-submit" onclick="CodeQuestAuth.handleRegister()">สมัครสมาชิก</button>
-          <div id="reg-error" class="auth-error"></div>
+          <div id="reg-error"   class="auth-error"></div>
           <div id="reg-success" class="auth-success"></div>
         </div>
       </div>
@@ -202,73 +176,78 @@ const CodeQuestAuth = {
   },
 
   closeModal() {
-    const modal = document.getElementById('auth-modal');
-    if (modal) modal.classList.remove('show');
+    document.getElementById('auth-modal')?.classList.remove('show');
   },
 
   switchTab(tab) {
     const tabs = document.querySelectorAll('.auth-tab');
+    const loginF = document.getElementById('auth-login-form');
+    const regF   = document.getElementById('auth-register-form');
     tabs.forEach(t => t.classList.remove('active'));
     if (tab === 'login') {
       tabs[0].classList.add('active');
-      document.getElementById('auth-login-form').style.display = 'block';
-      document.getElementById('auth-register-form').style.display = 'none';
+      loginF.style.display = 'block';
+      regF.style.display   = 'none';
     } else {
       tabs[1].classList.add('active');
-      document.getElementById('auth-login-form').style.display = 'none';
-      document.getElementById('auth-register-form').style.display = 'block';
+      loginF.style.display = 'none';
+      regF.style.display   = 'block';
     }
   },
 
   async handleLogin() {
-    const email = document.getElementById('login-email').value.trim();
+    const email    = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
-    const errEl = document.getElementById('login-error');
+    const errEl    = document.getElementById('login-error');
     errEl.textContent = '';
 
-    if (!email || !password) {
-      errEl.textContent = 'กรุณากรอกอีเมลและรหัสผ่าน';
-      return;
-    }
+    if (!email || !password) { errEl.textContent = 'กรุณากรอกอีเมลและรหัสผ่าน'; return; }
+
+    const btn = document.querySelector('#auth-login-form .auth-submit');
+    btn.disabled     = true;
+    btn.textContent  = 'กำลังเข้าสู่ระบบ...';
 
     try {
       await this.signIn(email, password);
       this.closeModal();
     } catch (e) {
-      errEl.textContent = e.message === 'Invalid login credentials'
-        ? 'อีเมลหรือรหัสผ่านไม่ถูกต้อง'
-        : e.message;
+      errEl.textContent = e.message;
+    } finally {
+      btn.disabled    = false;
+      btn.textContent = 'เข้าสู่ระบบ';
     }
   },
 
   async handleRegister() {
-    const name = document.getElementById('reg-name').value.trim();
+    const name  = document.getElementById('reg-name').value.trim();
     const email = document.getElementById('reg-email').value.trim();
-    const pw = document.getElementById('reg-password').value;
-    const pw2 = document.getElementById('reg-password2').value;
+    const school= document.getElementById('reg-school').value.trim();
+    const pw    = document.getElementById('reg-password').value;
+    const pw2   = document.getElementById('reg-password2').value;
     const errEl = document.getElementById('reg-error');
-    const successEl = document.getElementById('reg-success');
+    const okEl  = document.getElementById('reg-success');
     errEl.textContent = '';
-    successEl.textContent = '';
+    okEl.textContent  = '';
 
-    if (!name || !email || !pw) {
-      errEl.textContent = 'กรุณากรอกข้อมูลให้ครบ';
-      return;
-    }
-    if (pw.length < 6) {
-      errEl.textContent = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
-      return;
-    }
-    if (pw !== pw2) {
-      errEl.textContent = 'รหัสผ่านไม่ตรงกัน';
-      return;
-    }
+    if (!name || !email || !pw) { errEl.textContent = 'กรุณากรอกข้อมูลให้ครบ'; return; }
+    if (pw.length < 6)          { errEl.textContent = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัว'; return; }
+    if (pw !== pw2)             { errEl.textContent = 'รหัสผ่านไม่ตรงกัน'; return; }
+
+    const btn = document.querySelector('#auth-register-form .auth-submit');
+    btn.disabled    = true;
+    btn.textContent = 'กำลังสมัคร...';
 
     try {
       await this.signUp(email, pw, name);
-      successEl.textContent = 'สมัครสำเร็จ! กรุณาเช็คอีเมลเพื่อยืนยัน';
+      // Update school if provided
+      if (school) await this.updateProfile({ school }).catch(() => {});
+      okEl.textContent = '🎉 สมัครสำเร็จ! ยินดีต้อนรับสู่ CodeQuest';
+      setTimeout(() => this.closeModal(), 1500);
     } catch (e) {
       errEl.textContent = e.message;
+    } finally {
+      btn.disabled    = false;
+      btn.textContent = 'สมัครสมาชิก';
     }
   }
 };
@@ -278,320 +257,192 @@ const CodeQuestAuth = {
 // ============================================================
 
 const CodeQuestProgress = {
-  gameKey: '',
-  localStorageKey: '',
+  gameKey:          '',
+  localStorageKey:  '',
 
   init(gameKey, localStorageKey) {
-    this.gameKey = gameKey;
+    this.gameKey         = gameKey;
     this.localStorageKey = localStorageKey;
   },
 
-  // โหลด progress (Supabase ถ้า login, localStorage ถ้าไม่ login)
+  // โหลด progress — cloud ถ้า login, localStorage ถ้าไม่ login
   async load() {
-    // ถ้า login → โหลดจาก Supabase
-    if (CodeQuestAuth.currentUser && supabase) {
+    if (CodeQuestAuth.currentUser) {
       try {
-        const { data } = await supabase
-          .from('game_progress')
-          .select('*')
-          .eq('user_id', CodeQuestAuth.currentUser.id)
-          .eq('game_key', this.gameKey)
-          .single();
-
-        if (data) {
-          // Sync กลับลง localStorage ด้วย
-          const localData = {
-            currentLevel: data.current_level,
-            maxLevel: data.max_level_reached,
-            xp: data.total_xp,
-            completedLevels: data.completed_levels || [],
-            levelScores: data.level_scores || {}
-          };
-          localStorage.setItem(this.localStorageKey, JSON.stringify(localData));
-          return localData;
+        const res = await CodeQuestAuth._api(
+          'GET', `/progress.php?game=${this.gameKey}`
+        );
+        if (!res.error && res.data) {
+          localStorage.setItem(this.localStorageKey, JSON.stringify(res.data));
+          return res.data;
         }
-      } catch (e) {
-        console.log('Supabase load failed, falling back to localStorage');
-      }
+      } catch { /* fallback */ }
     }
-
-    // Fallback: localStorage
     const saved = localStorage.getItem(this.localStorageKey);
     return saved ? JSON.parse(saved) : null;
   },
 
   // บันทึก progress
   async save(progressData) {
-    // บันทึกลง localStorage เสมอ
+    // บันทึก local เสมอ (instant)
     localStorage.setItem(this.localStorageKey, JSON.stringify(progressData));
 
-    // ถ้า login → บันทึกลง Supabase ด้วย
-    if (CodeQuestAuth.currentUser && supabase) {
+    // ส่งขึ้น cloud ถ้า login
+    if (CodeQuestAuth.currentUser) {
       try {
-        const { error } = await supabase
-          .from('game_progress')
-          .upsert({
-            user_id: CodeQuestAuth.currentUser.id,
-            game_key: this.gameKey,
-            current_level: progressData.currentLevel || 1,
-            max_level_reached: progressData.maxLevel || 1,
-            total_xp: progressData.xp || 0,
-            completed_levels: progressData.completedLevels || [],
-            level_scores: progressData.levelScores || {}
-          }, {
-            onConflict: 'user_id,game_key'
-          });
-
-        if (!error) {
-          // อัพเดท total XP ใน profiles
-          await supabase.rpc('recalc_total_xp', { uid: CodeQuestAuth.currentUser.id });
-        }
-      } catch (e) {
-        console.log('Supabase save failed:', e);
-      }
+        await CodeQuestAuth._api('POST', '/progress.php', {
+          game_key:        this.gameKey,
+          ...progressData
+        });
+      } catch { /* silent fail */ }
     }
   },
 
-  // Sync localStorage → Supabase (เรียกตอน login ครั้งแรก)
-  async syncLocalToCloud() {
-    if (!CodeQuestAuth.currentUser || !supabase) return;
+  // บันทึกเมื่อผ่านด่าน (atomic)
+  async completeLevel(levelNum, xpGained, hintsUsed = 0, attempts = 1, passedCases = 0, totalCases = 0) {
+    if (!CodeQuestAuth.currentUser) return;
+    try {
+      await CodeQuestAuth._api('POST', '/progress.php?action=complete', {
+        game_key:     this.gameKey,
+        level_num:    levelNum,
+        xp_gained:    xpGained,
+        hints_used:   hintsUsed,
+        attempts,
+        passed_cases: passedCases,
+        total_cases:  totalCases,
+      });
+    } catch { /* silent fail */ }
+  },
 
+  // Sync local → cloud (เรียกหลัง login)
+  async syncLocalToCloud() {
+    if (!CodeQuestAuth.currentUser) return;
     const saved = localStorage.getItem(this.localStorageKey);
     if (!saved) return;
-
     const localData = JSON.parse(saved);
+    if (!localData || !localData.maxLevel) return;
 
-    // เช็คว่า cloud มีข้อมูลอยู่แล้วไหม
-    const { data: cloudData } = await supabase
-      .from('game_progress')
-      .select('*')
-      .eq('user_id', CodeQuestAuth.currentUser.id)
-      .eq('game_key', this.gameKey)
-      .single();
-
-    // ถ้า cloud ไม่มี หรือ local ไปไกลกว่า → อัพโหลด local
-    if (!cloudData || (localData.maxLevel > (cloudData.max_level_reached || 0))) {
-      await this.save(localData);
-    }
-    // ถ้า cloud ไปไกลกว่า → ดาวน์โหลด cloud
-    else if (cloudData.max_level_reached > (localData.maxLevel || 0)) {
-      const cloudProgress = {
-        currentLevel: cloudData.current_level,
-        maxLevel: cloudData.max_level_reached,
-        xp: cloudData.total_xp,
-        completedLevels: cloudData.completed_levels || [],
-        levelScores: cloudData.level_scores || {}
-      };
-      localStorage.setItem(this.localStorageKey, JSON.stringify(cloudProgress));
-    }
+    try {
+      const cloud = await CodeQuestAuth._api(
+        'GET', `/progress.php?game=${this.gameKey}`
+      );
+      // ถ้า local ไปได้ไกลกว่า → push ขึ้น cloud
+      if (!cloud.data || localData.maxLevel > (cloud.data.maxLevel || 0)) {
+        await this.save(localData);
+      }
+    } catch { /* silent */ }
   }
 };
 
 // ============================================================
-// AUTH CSS (injected into page)
+// AUTH UI INJECTION
 // ============================================================
+
+function injectAuthUI() {
+  injectAuthStyles();
+  const topBar = document.querySelector('.top-bar');
+  if (!topBar) return;
+
+  const container = document.createElement('div');
+  container.style.cssText = 'display:flex;align-items:center;gap:10px;margin-left:auto;';
+  container.innerHTML = `
+    <span class="sync-badge offline" id="sync-badge">💾 Local</span>
+    <button id="auth-btn" onclick="CodeQuestAuth.openModal()">👤 เข้าสู่ระบบ</button>
+    <div id="user-info" style="display:none">
+      <div class="user-avatar" id="user-avatar">👤</div>
+      <span id="user-name"></span>
+      <button id="logout-btn" onclick="CodeQuestAuth.signOut()">ออก</button>
+    </div>
+  `;
+  topBar.appendChild(container);
+}
 
 function injectAuthStyles() {
   if (document.getElementById('cq-auth-styles')) return;
   const style = document.createElement('style');
   style.id = 'cq-auth-styles';
   style.textContent = `
-    /* Auth Button in Top Bar */
     #auth-btn {
       background: linear-gradient(135deg, var(--accent, #ff6b6b), var(--accent4, #a855f7));
-      border: none;
-      color: #fff;
-      padding: 8px 20px;
-      border-radius: 25px;
-      font-family: 'Prompt', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      border: none; color: #fff; padding: 8px 20px; border-radius: 25px;
+      font-family: 'Prompt', sans-serif; font-size: .85rem; font-weight: 600;
+      cursor: pointer; transition: all .3s; display: inline-flex; align-items: center; gap: 6px;
     }
     #auth-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
-
-    #user-info {
-      display: none;
-      align-items: center;
-      gap: 10px;
-      color: var(--text, #fff);
-      font-family: 'Prompt', sans-serif;
+    #user-info { display: none; align-items: center; gap: 10px; color: #fff; font-family: 'Prompt', sans-serif; }
+    .user-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #4ecdc4, #a855f7);
+      display: flex; align-items: center; justify-content: center; font-size: .9rem;
     }
-    #user-info .user-avatar {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent2, #4ecdc4), var(--accent4, #a855f7));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.9rem;
-    }
-    #user-name { font-size: 0.85rem; font-weight: 500; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #user-name { font-size: .85rem; font-weight: 500; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #logout-btn {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: var(--text-dim, #94a1b2);
-      padding: 5px 12px;
-      border-radius: 15px;
-      font-family: 'Prompt', sans-serif;
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: all 0.3s;
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+      color: #94a1b2; padding: 5px 12px; border-radius: 15px;
+      font-family: 'Prompt', sans-serif; font-size: .75rem; cursor: pointer; transition: all .3s;
     }
-    #logout-btn:hover { background: var(--error, #ef4444); color: #fff; border-color: transparent; }
+    #logout-btn:hover { background: #ef4444; color: #fff; border-color: transparent; }
+    .sync-badge {
+      font-size: .7rem; color: #4ecdc4; background: rgba(78,205,196,.1);
+      padding: 2px 8px; border-radius: 10px; font-family: 'Prompt', sans-serif;
+    }
+    .sync-badge.offline { color: #94a1b2; background: rgba(255,255,255,.05); }
 
     /* Auth Modal */
-    #auth-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000; }
-    #auth-modal.show { display: flex; align-items: center; justify-content: center; }
-    .auth-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
+    #auth-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:10000; }
+    #auth-modal.show { display:flex; align-items:center; justify-content:center; }
+    .auth-overlay { position:absolute; inset:0; background:rgba(0,0,0,.7); backdrop-filter:blur(5px); }
     .auth-box {
-      position: relative;
-      background: linear-gradient(145deg, #1a1932, #0f0e17);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
-      padding: 40px;
-      width: 420px;
-      max-width: 90vw;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
-      animation: authPop 0.3s ease;
+      position:relative; background:linear-gradient(145deg,#1a1932,#0f0e17);
+      border:1px solid rgba(255,255,255,.1); border-radius:20px; padding:40px;
+      width:420px; max-width:90vw; max-height:90vh; overflow-y:auto;
+      box-shadow:0 25px 60px rgba(0,0,0,.5); animation:authPop .3s ease; z-index:1;
     }
-    @keyframes authPop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    @keyframes authPop { from{opacity:0;transform:scale(.9)} to{opacity:1;transform:scale(1)} }
     .auth-close {
-      position: absolute; top: 15px; right: 20px;
-      background: none; border: none; color: #94a1b2;
-      font-size: 1.8rem; cursor: pointer; transition: color 0.3s;
+      position:absolute; top:15px; right:20px; background:none; border:none;
+      color:#94a1b2; font-size:1.8rem; cursor:pointer; transition:color .3s;
     }
-    .auth-close:hover { color: #ff6b6b; }
+    .auth-close:hover { color:#ff6b6b; }
     .auth-logo {
-      text-align: center; font-size: 1.5rem; font-weight: 800;
-      font-family: 'Prompt', sans-serif;
-      background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #ffe66d);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      margin-bottom: 25px;
+      text-align:center; font-size:1.5rem; font-weight:800;
+      font-family:'Prompt',sans-serif;
+      background:linear-gradient(135deg,#ff6b6b,#4ecdc4,#ffe66d);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      margin-bottom:25px;
     }
-    .auth-tabs { display: flex; gap: 5px; margin-bottom: 25px; }
+    .auth-tabs { display:flex; gap:5px; margin-bottom:25px; }
     .auth-tab {
-      flex: 1; padding: 10px; border: none;
-      background: rgba(255,255,255,0.05);
-      color: #94a1b2; border-radius: 10px;
-      font-family: 'Prompt', sans-serif;
-      font-size: 0.9rem; font-weight: 600;
-      cursor: pointer; transition: all 0.3s;
+      flex:1; padding:10px; border:none; background:rgba(255,255,255,.05);
+      color:#94a1b2; border-radius:10px; font-family:'Prompt',sans-serif;
+      font-size:.9rem; font-weight:600; cursor:pointer; transition:all .3s;
     }
-    .auth-tab.active { background: linear-gradient(135deg, #ff6b6b, #a855f7); color: #fff; }
+    .auth-tab.active { background:linear-gradient(135deg,#ff6b6b,#a855f7); color:#fff; }
     .auth-input {
-      width: 100%; padding: 12px 16px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px; color: #fff;
-      font-family: 'Prompt', sans-serif;
-      font-size: 0.9rem; margin-bottom: 12px;
-      outline: none; transition: border-color 0.3s;
+      width:100%; padding:12px 16px; background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.1); border-radius:10px; color:#fff;
+      font-family:'Prompt',sans-serif; font-size:.9rem; margin-bottom:12px;
+      outline:none; transition:border-color .3s; box-sizing:border-box;
     }
-    .auth-input:focus { border-color: #4ecdc4; }
-    .auth-input::placeholder { color: #555; }
+    .auth-input:focus { border-color:#4ecdc4; }
+    .auth-input::placeholder { color:#555; }
     .auth-submit {
-      width: 100%; padding: 12px;
-      background: linear-gradient(135deg, #ff6b6b, #a855f7);
-      border: none; border-radius: 10px;
-      color: #fff; font-family: 'Prompt', sans-serif;
-      font-size: 1rem; font-weight: 700;
-      cursor: pointer; transition: all 0.3s;
-      margin-top: 5px;
+      width:100%; padding:12px; background:linear-gradient(135deg,#ff6b6b,#a855f7);
+      border:none; border-radius:10px; color:#fff; font-family:'Prompt',sans-serif;
+      font-size:1rem; font-weight:700; cursor:pointer; transition:all .3s; margin-top:5px;
     }
-    .auth-submit:hover { transform: translateY(-2px); filter: brightness(1.1); }
-    .auth-error { color: #ef4444; font-size: 0.8rem; margin-top: 10px; text-align: center; font-family: 'Prompt', sans-serif; }
-    .auth-success { color: #10b981; font-size: 0.8rem; margin-top: 10px; text-align: center; font-family: 'Prompt', sans-serif; }
-    .auth-social { display: flex; gap: 10px; margin-bottom: 15px; }
-    .social-btn {
-      flex: 1; padding: 10px; border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 10px; color: #fff;
-      font-family: 'Prompt', sans-serif; font-size: 0.85rem;
-      cursor: pointer; display: flex; align-items: center;
-      justify-content: center; gap: 8px; transition: all 0.3s;
-    }
-    .social-btn.google { background: rgba(219,68,55,0.2); }
-    .social-btn.google:hover { background: rgba(219,68,55,0.4); }
-    .social-btn.github { background: rgba(255,255,255,0.05); }
-    .social-btn.github:hover { background: rgba(255,255,255,0.15); }
-    .auth-divider {
-      text-align: center; margin: 15px 0; position: relative;
-      color: #555; font-size: 0.8rem; font-family: 'Prompt', sans-serif;
-    }
-    .auth-divider::before, .auth-divider::after {
-      content: ''; position: absolute; top: 50%;
-      width: 35%; height: 1px; background: rgba(255,255,255,0.1);
-    }
-    .auth-divider::before { left: 0; }
-    .auth-divider::after { right: 0; }
-
-    /* Cloud sync indicator */
-    .sync-badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      font-size: 0.7rem; color: var(--accent2, #4ecdc4);
-      background: rgba(78,205,196,0.1);
-      padding: 2px 8px; border-radius: 10px;
-      font-family: 'Prompt', sans-serif;
-    }
-    .sync-badge.offline { color: var(--text-dim, #94a1b2); background: rgba(255,255,255,0.05); }
+    .auth-submit:hover:not(:disabled) { transform:translateY(-2px); filter:brightness(1.1); }
+    .auth-submit:disabled { opacity:.6; cursor:not-allowed; }
+    .auth-error   { color:#ef4444; font-size:.8rem; margin-top:10px; text-align:center; font-family:'Prompt',sans-serif; }
+    .auth-success { color:#10b981; font-size:.8rem; margin-top:10px; text-align:center; font-family:'Prompt',sans-serif; }
   `;
   document.head.appendChild(style);
 }
 
 // ============================================================
-// INJECT AUTH UI INTO TOP BAR
+// AUTO-INIT — เรียกอัตโนมัติเมื่อ DOM พร้อม
 // ============================================================
-
-function injectAuthUI() {
-  injectAuthStyles();
-
-  // หา top-bar แล้วเพิ่มปุ่ม login / user info
-  const topBar = document.querySelector('.top-bar');
-  if (!topBar) return;
-
-  // สร้าง container สำหรับ auth
-  const authContainer = document.createElement('div');
-  authContainer.style.cssText = 'display:flex;align-items:center;gap:10px;margin-left:auto;';
-  authContainer.innerHTML = `
-    <span class="sync-badge offline" id="sync-badge">💾 Local</span>
-    <button id="auth-btn" onclick="CodeQuestAuth.openModal()">👤 เข้าสู่ระบบ</button>
-    <div id="user-info">
-      <div class="user-avatar" id="user-avatar">👤</div>
-      <span id="user-name"></span>
-      <button id="logout-btn" onclick="CodeQuestAuth.signOut()">ออก</button>
-    </div>
-  `;
-  topBar.appendChild(authContainer);
-}
-
-// ============================================================
-// AUTO-INIT
-// ============================================================
-
 document.addEventListener('DOMContentLoaded', async () => {
-  // โหลด Supabase SDK
-  if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-    script.onload = async () => {
-      initSupabase();
-      injectAuthUI();
-      await CodeQuestAuth.init();
-
-      // อัพเดท sync badge
-      const badge = document.getElementById('sync-badge');
-      if (badge && CodeQuestAuth.currentUser) {
-        badge.className = 'sync-badge';
-        badge.innerHTML = '☁️ Cloud Sync';
-      }
-    };
-    document.head.appendChild(script);
-  } else {
-    // ถ้ายังไม่ตั้งค่า Supabase → แสดงปุ่มแต่ไม่ทำงาน
-    injectAuthUI();
-  }
+  injectAuthUI();
+  await CodeQuestAuth.init();
 });

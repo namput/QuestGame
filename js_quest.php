@@ -351,7 +351,7 @@ body {
   <!-- HOME -->
   <div class="screen active" id="home-screen">
     <div class="home-screen">
-      <div class="home-title">Python Quest</div>
+      <div class="home-title">JavaScript Quest</div>
       <div class="home-subtitle">ผจญภัยแดนโค้ด — เรียน JavaScript ผ่าน <strong>50 ด่าน</strong> สุดมัน!</div>
       <div class="stage-map" id="stage-map"></div>
     </div>
@@ -426,7 +426,7 @@ body {
       <div class="victory-icon">🏆</div>
       <div class="victory-title">สุดยอด! คุณคือ JavaScript Master!</div>
       <div class="victory-text">
-        คุณผ่านครบทั้ง 50 ด่าน! ตอนนี้คุณเข้าใจ Python ตั้งแต่พื้นฐานจนถึงขั้นสูง
+        คุณผ่านครบทั้ง 50 ด่าน! ตอนนี้คุณเข้าใจ JavaScript ตั้งแต่พื้นฐานจนถึงขั้นสูง
         <br><br>พร้อมสร้างโปรแกรมจริงแล้ว! 🚀
       </div>
       <button class="btn-restart" onclick="resetGame()">🔄 เล่นใหม่</button>
@@ -678,9 +678,9 @@ console.log(\`บวก: 5 + 3 = \${5 + 3}\`);</pre>
         ],
         codeCheck: `
 function codeCheck(code) {
-    const hasBacktick = code.includes('`');
-    const hasDollarBrace = code.includes('${');
-    if (!hasBacktick || !hasDollarBrace) return { pass: false, message: 'ต้องใช้ backtick กับ ${}' };
+  const hasBacktick = code.includes('\`');
+  const hasDollarBrace = code.includes('\${');
+  if (!hasBacktick || !hasDollarBrace) return { pass: false, message: 'ต้องใช้ backtick กับ \${}' };
     return { pass: true, message: 'ตรวจสอบผ่าน!' };
 }
 `,
@@ -1554,8 +1554,8 @@ Line 3</pre>
         ],
         codeCheck: `
 function codeCheck(code) {
-    const hasBacktick = code.includes('`');
-    const hasExpression = code.includes('${');
+  const hasBacktick = code.includes('\`');
+  const hasExpression = code.includes('\${');
     if (!hasBacktick || !hasExpression) return { pass: false, message: 'ต้องใช้ backtick + expression' };
     return { pass: true, message: 'ตรวจสอบผ่าน!' };
 }
@@ -2686,39 +2686,11 @@ function validate(output, expected) {
 
 
 
-        // ===== Game State =====
-        let gameState = {
-            currentLevel: 1,
-            xp: 0,
-            completedLevels: [],
-            hintsUsed: []
-        };
-
-        // Load game state
-        function loadGame() {
-            const saved = localStorage.getItem('jsquest_50');
-            if (saved) {
-                gameState = JSON.parse(saved);
-            }
-        }
-
-        // Save game state
-        function saveGame() {
-            localStorage.setItem('jsquest_50', JSON.stringify(gameState));
-        }
-
-        // ===== Output Capture =====
-        let capturedOutput = '';
-        const originalLog = console.log;
-        console.log = function(...args) {
-            capturedOutput += args.join(' ') + '\n';
-            originalLog.apply(console, args);
-        };
-
 // ============================
 // GAME STATE
 // ============================
 let currentLevel = null;
+    let currentLevelId = 1;
 let gameState = {
   currentLevel: 1,
   xp: 0,
@@ -2766,6 +2738,8 @@ function startGame() {
   createParticles();
   loadGame();
   renderStageMap();
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
 }
 
 function renderStageMap() {
@@ -2819,6 +2793,7 @@ function renderStageMap() {
 
 function startLevel(id) {
   gameState.currentLevel = id;
+  currentLevelId = id;
   currentLevel = LEVELS[id];
   
   document.getElementById('home-screen').classList.remove('active');
@@ -2834,9 +2809,10 @@ function startLevel(id) {
   
   document.getElementById('mission-text').innerHTML = currentLevel.mission || '';
   
-  if (currentLevel.expected) {
+  const expected = currentLevel.expectedOutput || currentLevel.expected;
+  if (expected) {
     document.getElementById('expected-box').style.display = 'block';
-    document.getElementById('expected-output').textContent = currentLevel.expected;
+    document.getElementById('expected-output').textContent = expected;
   } else {
     document.getElementById('expected-box').style.display = 'none';
   }
@@ -2979,19 +2955,22 @@ function submitCode() {
   }
   
   const output = executeCode(code);
+  const expected = currentLevel.expectedOutput || currentLevel.expected || '';
   const valid = typeof currentLevel.validate === 'function'
-    ? currentLevel.validate(output)
-    : eval('(' + currentLevel.validate + ')')(output, currentLevel.expected);
+    ? currentLevel.validate(output, expected)
+    : eval('(' + currentLevel.validate + ')')(output, expected);
   
   if (valid) {
     gameState.xp += currentLevel.xp || 50;
-    gameState.completed.push(currentLevel.id);
-    if (gameState.currentLevel === currentLevel.id) {
-      gameState.currentLevel = Math.min(currentLevel.id + 1, 50);
+    if (!gameState.completed.includes(currentLevelId)) {
+      gameState.completed.push(currentLevelId);
+    }
+    if (gameState.currentLevel === currentLevelId) {
+      gameState.currentLevel = Math.min(currentLevelId + 1, 50);
     }
     saveGame();
     
-    if (currentLevel.id === 50) {
+    if (currentLevelId === 50) {
       showVictory();
     } else {
       showResult(true);
@@ -3068,6 +3047,8 @@ function resetGame() {
   localStorage.removeItem('jsquest_50');
   location.reload();
 }
+
+startGame();
 </script>
 <script src="/auth.js"></script>
 </body>

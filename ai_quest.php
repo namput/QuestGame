@@ -89,6 +89,9 @@ body { font-family: 'Prompt', sans-serif; background: var(--bg); color: var(--te
 .stage-node:hover { transform: translateY(-4px); border-color: var(--accent2); box-shadow: 0 8px 30px rgba(78,205,196,0.15); }
 .stage-node.completed { border-color: var(--success); background: linear-gradient(135deg, rgba(16,185,129,0.1), var(--card)); }
 .stage-node.current { border-color: var(--accent3); animation: current-pulse 2s ease-in-out infinite; }
+.stage-node.locked { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.6); }
+.stage-node.locked:hover { transform: none; border-color: rgba(255,255,255,0.08); box-shadow: none; }
+.stage-lock { position: absolute; top: 8px; right: 8px; font-size: 1rem; }
 @keyframes current-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,230,109,0.3); } 50% { box-shadow: 0 0 20px 5px rgba(255,230,109,0.15); } }
 .stage-icon { font-size: 2rem; margin-bottom: 8px; }
 .stage-num { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 4px; }
@@ -1824,22 +1827,33 @@ async function sendTutorMsg() {
 function buildStageMap() {
   const map = document.getElementById('stage-map');
   if (!map) return;
-  let html = '';
+  map.innerHTML = '';
   for (const zone of ZONES) {
-    html += `<div class="zone-label zone${zone.id}">${zone.emoji} ${zone.name}</div>`;
+    const zoneLabel = document.createElement('div');
+    zoneLabel.className = `zone-label zone${zone.id}`;
+    zoneLabel.textContent = `${zone.emoji} ${zone.name}`;
+    map.appendChild(zoneLabel);
+
     for (const n of zone.levels) {
       const lv = LEVELS[n];
-      const done = completedLocal.has(n);
-      html += `<div class="stage-node${done ? ' completed' : ''}" onclick="navigateTo(${n})">
+      const done       = completedLocal.has(n);
+      const isUnlocked = n === 1 || completedLocal.has(n - 1);
+      const isCurrent  = isUnlocked && !done;
+
+      const node = document.createElement('div');
+      node.className = `stage-node${done ? ' completed' : ''}${isCurrent ? ' current' : ''}${!isUnlocked ? ' locked' : ''}`;
+      node.innerHTML = `
         ${done ? '<div class="stage-check">✅</div>' : ''}
+        ${!isUnlocked ? '<div class="stage-lock">🔒</div>' : ''}
         <div class="stage-icon">${zone.emoji}</div>
         <div class="stage-num">ด่าน ${n}</div>
         <div class="stage-name">${lv.title}</div>
         <div class="stage-tag">${lv.diff} · ${lv.xp}XP</div>
-      </div>`;
+      `;
+      if (isUnlocked) node.onclick = () => navigateTo(n);
+      map.appendChild(node);
     }
   }
-  map.innerHTML = html;
 }
 
 function showScreen(id) {
@@ -1871,18 +1885,19 @@ function navigateTo(n) {
   badge.style.cssText = `background:${zone.color}22;color:${zone.color};border:1px solid ${zone.color}44;padding:3px 10px;border-radius:12px;font-size:0.75rem;`;
   document.getElementById('nav-progress').textContent = `ด่าน ${n}/28`;
 
-  // Story box
+  // Story box — shows brief description
   const storyBox = document.getElementById('story-box');
   storyBox.className = `story-box theme-${lv.theme}`;
   document.getElementById('story-char').textContent = lv.character;
-  document.getElementById('story-text').innerHTML = lv.story;
+  document.getElementById('story-text').innerHTML = lv.story || lv.desc || '';
 
-  // Tutorial box
+  // Tutorial box — ALWAYS show with concept (teach BEFORE task)
   const tutBox = document.getElementById('tutorial-box');
-  if (lv.tutorialContent) {
+  const tutContent = lv.tutorialContent || lv.concept || '';
+  if (tutContent) {
     tutBox.style.display = 'block';
-    document.getElementById('tutorial-title').textContent = lv.tutorialTitle || lv.title;
-    document.getElementById('tutorial-content').innerHTML = lv.tutorialContent;
+    document.getElementById('tutorial-title').textContent = `📚 ${lv.tutorialTitle || lv.title} — ตัวอย่างโค้ด`;
+    document.getElementById('tutorial-content').innerHTML = tutContent;
   } else {
     tutBox.style.display = 'none';
   }

@@ -7,8 +7,8 @@
 define('DB_HOST', 'localhost');
 define('DB_PORT', '3306');
 define('DB_NAME', 'neuatech_gamecode');
-define('DB_USER', 'neuatech_gamecode');   // ← ใส่ username จริง
-define('DB_PASS', 'YOUR_DB_PASSWORD');   // ← ใส่ password จริง
+define('DB_USER', 'neuatech_gamecode');
+define('DB_PASS', 'utcThbtHw8SP96q');
 define('DB_CHARSET', 'utf8mb4');
 
 // App settings

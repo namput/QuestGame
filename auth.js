@@ -6,7 +6,7 @@
 // ไม่ต้องการ Supabase
 // ============================================================
 
-const API_BASE = './api';   // เปลี่ยนเป็น '/api' ถ้า HTML อยู่ที่ root
+const API_BASE = '/api';
 
 // ============================================================
 // AUTH FUNCTIONS
@@ -17,24 +17,25 @@ const CodeQuestAuth = {
   profile:     null,
   token:       null,
 
-  // เช็คว่า login อยู่ไหม (เรียกตอนโหลดหน้า)
-  async init() {
-    this.token = localStorage.getItem('cq_token');
-    if (!this.token) {
-      this.updateUI();
-      return null;
-    }
-    try {
-      const res  = await this._api('GET', '/auth.php?action=me');
-      if (res.error) { this._clearSession(); return null; }
-      this.currentUser = res.user;
-      this.profile     = res.user;
-      this.updateUI();
-      return this.currentUser;
-    } catch {
-      this._clearSession();
-      return null;
-    }
+  // เช็คว่า login อยู่ไหม (เรียกตอนโหลดหน้า — memoized: API ถูกเรียกแค่ครั้งเดียว)
+  init() {
+    if (this._initPromise) return this._initPromise;
+    this._initPromise = (async () => {
+      this.token = localStorage.getItem('cq_token');
+      if (!this.token) { this.updateUI(); return null; }
+      try {
+        const res  = await this._api('GET', '/auth.php?action=me');
+        if (res.error) { this._clearSession(); return null; }
+        this.currentUser = res.user;
+        this.profile     = res.user;
+        this.updateUI();
+        return this.currentUser;
+      } catch {
+        this._clearSession();
+        return null;
+      }
+    })();
+    return this._initPromise;
   },
 
   // สมัครสมาชิก
@@ -87,9 +88,10 @@ const CodeQuestAuth = {
   },
 
   _clearSession() {
-    this.token       = null;
-    this.currentUser = null;
-    this.profile     = null;
+    this.token        = null;
+    this.currentUser  = null;
+    this.profile      = null;
+    this._initPromise = null;
     localStorage.removeItem('cq_token');
     if (typeof onAuthChange === 'function') onAuthChange('SIGNED_OUT');
   },

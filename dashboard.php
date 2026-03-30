@@ -488,7 +488,6 @@ function onAuthChange(event) {
 function showDashboard() {
   document.getElementById('login-section').style.display = 'none';
   document.getElementById('main-dashboard').style.display = 'block';
-  document.getElementById('nav-logout').style.display = 'inline-block';
 
   if (CodeQuestAuth.profile) {
     document.getElementById('profile-name').textContent = CodeQuestAuth.profile.display_name || 'นักผจญภัย';
@@ -503,7 +502,6 @@ function showDashboard() {
 function showLoginPrompt() {
   document.getElementById('login-section').style.display = 'block';
   document.getElementById('main-dashboard').style.display = 'none';
-  document.getElementById('nav-logout').style.display = 'none';
 }
 
 async function handleLogout() {
@@ -511,27 +509,23 @@ async function handleLogout() {
   showLoginPrompt();
 }
 
-// Init: also show dashboard if localStorage has data (even without login)
-document.addEventListener('DOMContentLoaded', () => {
-  // Check if any game has been played locally
+document.addEventListener('DOMContentLoaded', async () => {
+  await CodeQuestAuth.init();
+
   let hasLocalData = false;
   GAMES.forEach(game => {
     if (localStorage.getItem(game.lsKey)) hasLocalData = true;
   });
 
-  // If Supabase not configured or user not logged in but has local data → show dashboard anyway
-  setTimeout(() => {
-    if (CodeQuestAuth.currentUser) {
-      showDashboard();
-    } else if (hasLocalData) {
-      // Show dashboard with local data even without login
-      document.getElementById('login-section').style.display = 'none';
-      document.getElementById('main-dashboard').style.display = 'block';
-      document.getElementById('profile-name').textContent = 'นักผจญภัย (ไม่ได้ Login)';
-      document.getElementById('profile-email').textContent = 'Login เพื่อเก็บ progress ข้ามอุปกรณ์';
-      loadAllProgress();
-    }
-  }, 1500); // Wait for auth init
+  if (CodeQuestAuth.currentUser) {
+    showDashboard();
+  } else if (hasLocalData) {
+    document.getElementById('login-section').style.display = 'none';
+    document.getElementById('main-dashboard').style.display = 'block';
+    document.getElementById('profile-name').textContent = 'นักผจญภัย (ไม่ได้ Login)';
+    document.getElementById('profile-email').textContent = 'Login เพื่อเก็บ progress ข้ามอุปกรณ์';
+    loadAllProgress();
+  }
 });
 </script>
 </body>

@@ -339,7 +339,7 @@ body {
 
 <!-- APP -->
 <div class="app-container" id="app">
-  <div class="top-bar">
+  <div class="top-bar"><a href="/index.php" style="text-decoration:none;color:#94a1b2;font-family:Prompt,sans-serif;font-size:0.8rem;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);white-space:nowrap;transition:all 0.2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a1b2'">← กลับ</a>
     <div class="logo">⚡ JavaScript Quest <span>ผจญภัยแดนโค้ด</span></div>
     <div class="player-info">
       <div class="xp-text" id="xp-display">XP: 0 / 200</div>

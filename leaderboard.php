@@ -437,7 +437,7 @@ body {
 
 <script>
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
-const API_BASE = './api';
+const API_BASE = '/api';
 
 let currentUserId = null;
 let activeTab = 'overall';

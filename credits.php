@@ -131,7 +131,7 @@ textarea.slip-note:focus { border-color:var(--accent); }
 
 <script>
 const PROMPTPAY_NUMBER = '0624106706';
-const API = './api';
+const API = '/api';
 
 let selectedAmount = 100;
 let currentUser = null;
@@ -199,8 +199,14 @@ function renderLoginWall() {
       <div style="font-size:3rem;margin-bottom:16px;">🔐</div>
       <h2>กรุณาเข้าสู่ระบบก่อน</h2>
       <p>ต้องล็อกอินก่อนถึงจะเติมเครดิตได้</p>
-      <a href="index.php" class="btn-login">ไปหน้าหลัก</a>
+      <button class="btn-login" onclick="CodeQuestAuth.openModal()" style="border:none;cursor:pointer;">
+        👤 เข้าสู่ระบบ / สมัครสมาชิก
+      </button>
     </div>`;
+}
+
+function onAuthChange(event) {
+  if (event === 'SIGNED_IN') init();
 }
 
 function renderPage(credits) {

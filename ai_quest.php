@@ -1350,7 +1350,7 @@ async function boot() {
 async function loadCredits() {
   try {
     const token = localStorage.getItem('cq_token') || '';
-    const res = await fetch('./api/credits.php?action=balance', {
+    const res = await fetch('/api/credits.php?action=balance', {
       headers: { 'Authorization': 'Bearer ' + token }
     });
     const json = await res.json();
@@ -1445,7 +1445,7 @@ async function sendTutorMsg() {
 
   try {
     const token = localStorage.getItem('cq_token') || '';
-    const resp = await fetch('./api/ai-tutor.php', {
+    const resp = await fetch('/api/ai-tutor.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({

@@ -20,6 +20,18 @@ define('TOKEN_LENGTH', 64);
 define('ALLOWED_ORIGIN', '*');   // หรือ 'https://ผจญภัยแดนโค้ด.online'
 
 // ============================================================
+// Global exception handler — ให้ error ทุกชนิด return JSON
+// ============================================================
+set_exception_handler(function (Throwable $e) {
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+    }
+    echo json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
+    exit;
+});
+
+// ============================================================
 // Database connection (PDO singleton)
 // ============================================================
 function getDB(): PDO {

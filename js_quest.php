@@ -650,13 +650,13 @@ function validate(output, expected) {
         tutorialTitle: "Template Literal - ใช้ backtick",
         tutorialContent: `
 <h4>Template Literal คืออะไร?</h4>
-<p>Template literal ใช้ backtick (`) เพื่อสร้างสตริง และสามารถใส่ตัวแปรด้วย ${}</p>
+<p>Template literal ใช้ backtick (\`) เพื่อสร้างสตริง และสามารถใส่ตัวแปรด้วย \${}</p>
 
 <h4>ตัวอย่างโค้ด:</h4>
 <pre>let name = "Alice";
 let age = 25;
-console.log(`ชื่อ: ${name}, อายุ: ${age}`);
-console.log(`บวก: 5 + 3 = ${5 + 3}`);</pre>
+console.log(\`ชื่อ: \${name}, อายุ: \${age}\`);
+console.log(\`บวก: 5 + 3 = \${5 + 3}\`);</pre>
 
 <h4>Output:</h4>
 <pre>ชื่อ: Alice, อายุ: 25
@@ -664,7 +664,7 @@ console.log(`บวก: 5 + 3 = ${5 + 3}`);</pre>
 
 <h4>ข้อดี:</h4>
 <ul>
-<li>ใช้ ${} เพื่อใส่ตัวแปร</li>
+<li>ใช้ \${} เพื่อใส่ตัวแปร</li>
 <li>สะอาดกว่า concatenation (+ +)</li>
 <li>สามารถ multiline ได้</li>
 </ul>
@@ -1534,10 +1534,10 @@ function validate(output, expected) {
 <h4>ตัวอย่างโค้ด:</h4>
 <pre>let x = 5;
 let y = 10;
-console.log(`x + y = ${x + y}`);
-console.log(`Line 1
+console.log(\`x + y = \${x + y}\`);
+console.log(\`Line 1
 Line 2
-Line 3`);</pre>
+Line 3\`);</pre>
 
 <h4>Output:</h4>
 <pre>x + y = 15

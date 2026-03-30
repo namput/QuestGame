@@ -276,12 +276,188 @@ textarea#code-editor {
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-text { color: var(--text-dim); font-size: 0.9rem; }
 
+/* ── STORY BOX ── */
+.story-box {
+  background: linear-gradient(135deg, rgba(26,25,50,0.9), rgba(15,14,23,0.9));
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 16px;
+  padding: 25px; margin-bottom: 20px; position: relative; overflow: hidden;
+}
+.story-box::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+.story-box.theme-space::before    { background: linear-gradient(180deg, var(--accent), var(--accent2)); }
+.story-box.theme-matrix::before   { background: linear-gradient(180deg, var(--zone2), var(--accent2)); }
+.story-box.theme-detective::before{ background: linear-gradient(180deg, var(--zone3), var(--accent2)); }
+.story-box.theme-dungeon::before  { background: linear-gradient(180deg, var(--zone4), var(--accent3)); }
+.story-character { font-size: 2.5rem; margin-bottom: 10px; }
+.story-text { font-size: 1rem; line-height: 1.8; color: var(--text); }
+.story-text .highlight { color: var(--accent3); font-weight: 600; }
+
+/* ── TUTORIAL BOX ── */
+.tutorial-box {
+  background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(78,205,196,0.05));
+  border: 1px solid rgba(168,85,247,0.2); border-radius: 16px;
+  padding: 25px; margin-bottom: 20px;
+}
+.tutorial-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: 12px; color: var(--accent); }
+.tutorial-box h3::before { content: '📖 '; }
+.tutorial-content { font-size: 0.92rem; line-height: 1.8; color: var(--text); }
+.tutorial-content code {
+  background: rgba(168,85,247,0.15); color: var(--accent);
+  padding: 2px 8px; border-radius: 6px; font-family: 'Fira Code', monospace; font-size: 0.83rem;
+}
+.tutorial-content pre {
+  background: var(--code-bg); padding: 14px; border-radius: 10px; margin: 10px 0;
+  font-family: 'Fira Code', monospace; font-size: 0.83rem; color: #e0e0ff;
+  line-height: 1.6; overflow-x: auto; border: 1px solid rgba(255,255,255,0.06);
+}
+.tutorial-content b { color: var(--accent2); }
+
+/* ── MISSION BOX ── */
+.mission-box {
+  background: var(--card); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 22px 24px; margin-bottom: 20px;
+}
+.mission-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; color: var(--accent3); }
+.mission-box h3::before { content: '🎯 '; }
+.mission-text { font-size: 0.93rem; line-height: 1.7; color: var(--text); }
+.mission-text code {
+  background: rgba(168,85,247,0.15); color: var(--accent);
+  padding: 2px 8px; border-radius: 6px; font-family: 'Fira Code', monospace; font-size: 0.83rem;
+}
+.mission-text ul { padding-left: 20px; margin-top: 6px; }
+.mission-text li { margin-bottom: 4px; color: var(--text-dim); }
+
+/* ── EXPECTED BOX ── */
+.expected-box {
+  background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.15);
+  border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;
+}
+.expected-box .label { color: var(--success); font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
+.expected-box pre {
+  font-family: 'Fira Code', monospace; font-size: 0.88rem; color: #a0ffa0;
+  background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; line-height: 1.5; overflow-x: auto;
+}
+
+/* ── 3-LEVEL HINTS ── */
+.hint-area { margin-bottom: 20px; }
+.hint-buttons { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.btn-hint-level {
+  background: rgba(255,230,109,0.1); border: 1px solid rgba(255,230,109,0.2);
+  color: var(--accent3); padding: 6px 16px; border-radius: 8px; cursor: pointer;
+  font-family: 'Prompt', sans-serif; font-size: 0.85rem; transition: all 0.2s;
+}
+.btn-hint-level:hover { background: rgba(255,230,109,0.2); }
+.btn-hint-level.used { opacity: 0.5; }
+.btn-hint-level.level2 { background: rgba(255,165,0,0.1); border-color: rgba(255,165,0,0.2); color: #ffa500; }
+.btn-hint-level.level3 { background: rgba(255,107,107,0.1); border-color: rgba(255,107,107,0.2); color: var(--zone4); }
+.hint-box-level {
+  background: rgba(255,230,109,0.05); border: 1px solid rgba(255,230,109,0.15);
+  border-radius: 12px; padding: 14px 18px; display: none;
+}
+.hint-box-level.show { display: block; }
+.hint-box-level p { color: var(--accent3); font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; }
+.hint-box-level.level2 { border-color: rgba(255,165,0,0.15); }
+.hint-box-level.level2 p { color: #ffa500; }
+.hint-box-level.level3 { border-color: rgba(255,107,107,0.15); }
+.hint-box-level.level3 p { color: var(--zone4); }
+.xp-penalty { font-size: 0.7rem; opacity: 0.6; display: block; margin-top: 2px; }
+
+/* ── CHOICES ── */
+.choices-area { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.choice-btn {
+  background: var(--card); border: 2px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 16px 20px; text-align: left; cursor: pointer;
+  font-family: 'Prompt', sans-serif; color: var(--text); font-size: 0.9rem; transition: all 0.2s;
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.choice-btn:hover { border-color: var(--accent2); background: rgba(78,205,196,0.05); }
+.choice-btn.selected { border-color: var(--accent2); background: rgba(78,205,196,0.1); }
+.choice-btn.correct { border-color: var(--success) !important; background: rgba(16,185,129,0.15) !important; }
+.choice-btn.wrong { border-color: var(--error) !important; background: rgba(239,68,68,0.1) !important; }
+.choice-label {
+  background: rgba(255,255,255,0.08); width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+}
+.choice-text { font-family: 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.5; white-space: pre-wrap; }
+
+/* ── ACTION BAR ── */
+.action-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+.btn-submit {
+  background: linear-gradient(135deg, var(--accent), #7c3aed); color: white; border: none;
+  padding: 11px 26px; border-radius: 12px; font-family: 'Prompt', sans-serif; font-size: 0.9rem;
+  font-weight: 700; cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(168,85,247,0.25);
+}
+.btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(168,85,247,0.35); }
+
+/* ── OUTPUT PANEL ── */
+.output-panel { background: #0d0d1a; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+.output-header {
+  background: rgba(255,255,255,0.03); padding: 8px 14px; font-size: 0.8rem;
+  color: var(--text-dim); border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex; align-items: center; gap: 7px;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot.red { background: #ef4444; } .dot.yellow { background: #eab308; } .dot.green { background: #22c55e; }
+.output-body {
+  padding: 14px 16px; font-family: 'Fira Code', monospace; font-size: 0.85rem;
+  color: #a0ffa0; min-height: 60px; max-height: 220px; overflow-y: auto;
+  white-space: pre-wrap; line-height: 1.6;
+}
+.output-body.error { color: var(--error); }
+
+/* ── RESULT MODAL ── */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+  display: none; align-items: center; justify-content: center; z-index: 300;
+}
+.modal-overlay.show { display: flex; }
+.modal-content {
+  background: var(--card); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px; padding: 40px; text-align: center;
+  max-width: 480px; width: 90%; animation: modal-pop 0.4s ease;
+}
+@keyframes modal-pop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.modal-icon { font-size: 4rem; margin-bottom: 16px; }
+.modal-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; }
+.modal-text { color: var(--text-dim); margin-bottom: 8px; line-height: 1.6; }
+.modal-xp { color: var(--accent3); font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; }
+.btn-next-modal {
+  background: linear-gradient(135deg, var(--accent3), #f59e0b); color: #000; border: none;
+  padding: 14px 40px; border-radius: 14px; font-family: 'Prompt', sans-serif; font-size: 1.05rem;
+  font-weight: 700; cursor: pointer; transition: all 0.2s;
+}
+.btn-next-modal:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,230,109,0.3); }
+.modal-content.fail .modal-title { color: var(--error); }
+.btn-retry {
+  background: linear-gradient(135deg, var(--accent), #dc2626); color: white; border: none;
+  padding: 14px 40px; border-radius: 14px; font-family: 'Prompt', sans-serif; font-size: 1.05rem;
+  font-weight: 700; cursor: pointer; transition: all 0.2s;
+}
+
+/* ── VICTORY ── */
+.victory-screen { min-height: calc(100vh - 57px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
+.victory-icon { font-size: 6rem; margin-bottom: 20px; animation: bounce-vi 1s ease infinite; }
+@keyframes bounce-vi { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+.victory-title {
+  font-size: 3rem; font-weight: 800;
+  background: linear-gradient(135deg, var(--accent3), var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 15px;
+}
+.victory-text { color: var(--text-dim); font-size: 1.1rem; line-height: 1.8; max-width: 600px; }
+.btn-restart {
+  margin-top: 30px; background: linear-gradient(135deg, var(--accent2), var(--accent));
+  color: white; border: none; padding: 16px 50px; border-radius: 14px;
+  font-family: 'Prompt', sans-serif; font-size: 1.05rem; font-weight: 700; cursor: pointer;
+}
+
 @media (max-width: 768px) {
   .stage-map { grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .home-title { font-size: 2.5rem; }
   .game-screen { padding: 15px; }
   .top-bar { padding: 10px 16px; }
   .player-info .xp-bar-container { display: none; }
+  .choices-area { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -326,8 +502,94 @@ textarea#code-editor {
           <div class="theme-badge" id="game-theme-badge"></div>
         </div>
       </div>
-      <div id="main-content"></div>
+
+      <!-- STORY BOX -->
+      <div class="story-box theme-space" id="story-box">
+        <div class="story-character" id="story-char">🧠</div>
+        <div class="story-text" id="story-text"></div>
+      </div>
+
+      <!-- TUTORIAL BOX -->
+      <div class="tutorial-box" id="tutorial-box" style="display:none;">
+        <h3 id="tutorial-title"></h3>
+        <div class="tutorial-content" id="tutorial-content"></div>
+      </div>
+
+      <!-- MISSION BOX -->
+      <div class="mission-box">
+        <h3>ภารกิจ</h3>
+        <div class="mission-text" id="mission-text"></div>
+      </div>
+
+      <!-- EXPECTED OUTPUT -->
+      <div class="expected-box" id="expected-box" style="display:none;">
+        <div class="label">📤 ผลลัพธ์ที่ต้องการ:</div>
+        <pre id="expected-output"></pre>
+      </div>
+
+      <!-- 3-LEVEL HINTS -->
+      <div class="hint-area">
+        <div class="hint-buttons" id="hint-buttons"></div>
+        <div class="hint-box-level" id="hint-box-level-1"><p id="hint-text-1"></p></div>
+        <div class="hint-box-level level2" id="hint-box-level-2"><p id="hint-text-2"></p></div>
+        <div class="hint-box-level level3" id="hint-box-level-3"><p id="hint-text-3"></p></div>
+      </div>
+
+      <!-- CODE EDITOR -->
+      <div id="editor-section" style="display:none;">
+        <div style="margin-bottom:0;">
+          <div style="display:flex;">
+            <div class="editor-tab active">📄 solution.py</div>
+          </div>
+          <textarea class="code-editor" id="code-editor" spellcheck="false" placeholder="# เขียนโค้ด Python ที่นี่..."></textarea>
+        </div>
+        <div class="action-bar">
+          <button class="btn-run" id="run-btn" onclick="runCode()">▶ รันโค้ด</button>
+          <button class="btn-submit" onclick="submitCode()">🚀 ส่งคำตอบ</button>
+          <button class="btn-reset" onclick="resetCode()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-dim);font-family:'Prompt',sans-serif;font-size:0.85rem;padding:11px 16px;border-radius:12px;cursor:pointer;">↩ Reset</button>
+        </div>
+        <div class="output-panel">
+          <div class="output-header">
+            <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+            <span>Output</span>
+          </div>
+          <div class="output-body" id="output-body">รอรันโค้ด...</div>
+        </div>
+      </div>
+
+      <!-- MULTIPLE CHOICE -->
+      <div id="choice-section" style="display:none;">
+        <div class="choices-area" id="choices-area"></div>
+        <div class="action-bar">
+          <button class="btn-submit" onclick="submitChoice()">🚀 ส่งคำตอบ</button>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- VICTORY SCREEN -->
+  <div class="screen" id="victory-screen">
+    <div class="victory-screen">
+      <div class="victory-icon">🏆</div>
+      <div class="victory-title">AI Quest สำเร็จแล้ว!</div>
+      <div class="victory-text">
+        คุณผ่านครบ 28 ด่าน!<br>
+        Python, NumPy, pandas และ Machine Learning — คุณมีพื้นฐานแน่นแล้ว!<br><br>
+        พร้อมสร้างโปรเจค AI ของตัวเองได้เลย! 🚀
+      </div>
+      <button class="btn-restart" onclick="goHome()">← กลับหน้าเลือกด่าน</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT MODAL -->
+<div class="modal-overlay" id="result-modal">
+  <div class="modal-content" id="modal-content">
+    <div class="modal-icon" id="modal-icon"></div>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-text" id="modal-text"></div>
+    <div class="modal-xp" id="modal-xp"></div>
+    <button id="modal-btn" onclick="closeModal()"></button>
   </div>
 </div>
 
@@ -1317,17 +1579,53 @@ print("Mean prob:", round(float(output.mean()), 4))`,
   }
 };
 
+// ─── Enrich LEVELS with defaults ───────────────────────────────
+const ZONE_META = {
+  1: { theme: 'space',      character: '🧠' },
+  2: { theme: 'matrix',     character: '🔢' },
+  3: { theme: 'detective',  character: '🐼' },
+  4: { theme: 'dungeon',    character: '🤖' },
+};
+Object.keys(LEVELS).forEach(n => {
+  const lv = LEVELS[n];
+  const zm = ZONE_META[lv.zone] || ZONE_META[1];
+  if (!lv.theme)         lv.theme = zm.theme;
+  if (!lv.character)     lv.character = zm.character;
+  if (!lv.story)         lv.story = lv.desc || lv.title;
+  if (!lv.mission) {
+    const testDesc = (lv.tests || []).map(t => `<li>${t.label}</li>`).join('');
+    lv.mission = `${lv.desc}${testDesc ? `<br><br><strong>ต้องผ่าน:</strong><ul>${testDesc}</ul>` : ''}`;
+  }
+  if (!lv.successMsg)    lv.successMsg = `เก่งมาก! ผ่านด่าน <strong>${lv.title}</strong> แล้ว!`;
+  if (!lv.tutorialTitle) lv.tutorialTitle = lv.title;
+  if (!lv.tutorialContent) lv.tutorialContent = lv.concept || '';
+  if (!lv.type)          lv.type = 'code';
+  // Upgrade hints to 3-level with emoji prefixes
+  if (lv.hints && lv.hints.length > 0) {
+    const pre = ['💡', '🔶', '🔴'];
+    lv.hints = lv.hints.slice(0, 3).map((h, i) => {
+      if (/^[💡🔶🔴]/.test(h)) return h;
+      return `${pre[i] || '💡'} ${h}`;
+    });
+    while (lv.hints.length < 3) {
+      lv.hints.push('🔴 อ่านแนวคิดด้านบนอีกครั้ง และดู starter code เป็นแนวทาง');
+    }
+  }
+});
+
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
 const GAME_KEY = 'ai';
 let currentLevel = 1;
-let hintIndex = {};
-let attempts = {};
+let hintsUsed    = {};
+let selectedChoice = -1;
+let xpPenalty    = 0;
+let attempts     = {};
 let completedLocal = new Set();
-let xpLocal = {};
+let xpLocal      = {};
 let pyodideReady = false;
-let userCredits = 0;
+let userCredits  = 0;
 let tutorMessages = [];  // [{role, content}]
 
 // ═══════════════════════════════════════════════════════════════
@@ -1556,210 +1854,259 @@ function goHome() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// NAVIGATE
+// NAVIGATE — populate static game screen elements (like python_quest.php)
 // ═══════════════════════════════════════════════════════════════
 function navigateTo(n) {
-  currentLevel = n;
-  const lv = LEVELS[n];
+  currentLevel   = n;
+  xpPenalty      = 0;
+  selectedChoice = -1;
+
+  const lv   = LEVELS[n];
   const zone = ZONES.find(z => z.id === lv.zone);
 
+  // Top bar
   document.getElementById('game-stage-title').textContent = `ด่าน ${n}: ${lv.title}`;
   const badge = document.getElementById('game-theme-badge');
-  badge.textContent = `${zone.emoji} ${zone.name}`;
+  badge.textContent = `${zone.emoji} ${zone.name} · ⭐${lv.xp} XP · ${lv.diff}`;
   badge.style.cssText = `background:${zone.color}22;color:${zone.color};border:1px solid ${zone.color}44;padding:3px 10px;border-radius:12px;font-size:0.75rem;`;
   document.getElementById('nav-progress').textContent = `ด่าน ${n}/28`;
 
+  // Story box
+  const storyBox = document.getElementById('story-box');
+  storyBox.className = `story-box theme-${lv.theme}`;
+  document.getElementById('story-char').textContent = lv.character;
+  document.getElementById('story-text').innerHTML = lv.story;
+
+  // Tutorial box
+  const tutBox = document.getElementById('tutorial-box');
+  if (lv.tutorialContent) {
+    tutBox.style.display = 'block';
+    document.getElementById('tutorial-title').textContent = lv.tutorialTitle || lv.title;
+    document.getElementById('tutorial-content').innerHTML = lv.tutorialContent;
+  } else {
+    tutBox.style.display = 'none';
+  }
+
+  // Mission
+  document.getElementById('mission-text').innerHTML = lv.mission;
+
+  // Expected output (first stdout test)
+  const expectedBox = document.getElementById('expected-box');
+  const firstStdout = (lv.tests || []).find(t => t.type === 'stdout');
+  if (firstStdout && firstStdout.expected) {
+    expectedBox.style.display = 'block';
+    document.getElementById('expected-output').textContent = firstStdout.expected;
+  } else {
+    expectedBox.style.display = 'none';
+  }
+
+  // 3-level hints
+  renderHints(lv, n);
+
+  // Editor vs choice
+  if (lv.type === 'choice') {
+    document.getElementById('editor-section').style.display = 'none';
+    document.getElementById('choice-section').style.display = 'block';
+    renderChoices(lv.choices);
+  } else {
+    document.getElementById('editor-section').style.display = 'block';
+    document.getElementById('choice-section').style.display = 'none';
+    document.getElementById('code-editor').value = lv.starter || '';
+    document.getElementById('output-body').textContent = 'รอรันโค้ด...';
+    document.getElementById('output-body').className = 'output-body';
+  }
+
   showScreen('game-screen');
-  renderLevel(n);
 }
 
-function renderLevel(n) {
-  const lv = LEVELS[n];
-  const zone = ZONES.find(z => z.id === lv.zone);
-  const done = completedLocal.has(n);
+// ─── Hint system ───────────────────────────────────────────────
+function renderHints(lv, n) {
+  const container = document.getElementById('hint-buttons');
+  container.innerHTML = '';
+  const defs = [
+    { label: '💡 คำใบ้เบาๆ',      penalty: 'ฟรี!',  cls: '',       boxId: 'hint-box-level-1', textId: 'hint-text-1' },
+    { label: '🔶 คำใบ้ปานกลาง',   penalty: '-10 XP', cls: 'level2', boxId: 'hint-box-level-2', textId: 'hint-text-2' },
+    { label: '🔴 เฉลยแนวทาง',     penalty: '-25 XP', cls: 'level3', boxId: 'hint-box-level-3', textId: 'hint-text-3' },
+  ];
+  defs.forEach(d => document.getElementById(d.boxId).classList.remove('show'));
+  if (!lv.hints) return;
+  lv.hints.slice(0, 3).forEach((hintText, i) => {
+    const d = defs[i];
+    document.getElementById(d.textId).textContent = hintText;
+    const btn = document.createElement('button');
+    btn.className = `btn-hint-level ${d.cls}`;
+    const used = hintsUsed[n] && hintsUsed[n].includes(i);
+    if (used) btn.classList.add('used');
+    btn.innerHTML = `${d.label} <span class="xp-penalty">${d.penalty}</span>`;
+    btn.onclick = () => toggleHintLevel(n, i, d.boxId);
+    container.appendChild(btn);
+  });
+}
 
-  const main = document.getElementById('main-content');
-  main.innerHTML = `
-    <!-- HEADER -->
-    <div class="level-header">
-      <div class="level-badge-row">
-        <span class="zone-chip" style="background:${zone.color}22;color:${zone.color};border:1px solid ${zone.color}44">${zone.emoji} ${zone.name}</span>
-        <span class="level-num-chip">ด่าน ${n}/28</span>
-        ${done ? '<span class="zone-chip" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3)">✅ ผ่านแล้ว</span>' : ''}
-      </div>
-      <div class="level-title">${lv.title}</div>
-      <div class="level-desc">${lv.desc}</div>
-      <div class="level-meta">
-        <span class="meta-chip chip-xp">⭐ ${lv.xp} XP</span>
-        <span class="meta-chip chip-tests">🧪 ${lv.tests.length} test case${lv.tests.length > 1 ? 's' : ''}</span>
-        <span class="meta-chip chip-diff">📊 ${lv.diff}</span>
-      </div>
-    </div>
+function toggleHintLevel(levelNum, hintIdx, boxId) {
+  const box = document.getElementById(boxId);
+  const showing = box.classList.contains('show');
+  ['hint-box-level-1','hint-box-level-2','hint-box-level-3'].forEach(id =>
+    document.getElementById(id).classList.remove('show'));
+  if (!showing) {
+    box.classList.add('show');
+    if (!hintsUsed[levelNum]) hintsUsed[levelNum] = [];
+    if (!hintsUsed[levelNum].includes(hintIdx)) {
+      hintsUsed[levelNum].push(hintIdx);
+      xpPenalty += [0, 10, 25][hintIdx];
+    }
+  }
+}
 
-    <!-- CONCEPT -->
-    <div class="concept-box">
-      <h3>📖 แนวคิด</h3>
-      <div>${lv.concept}</div>
-    </div>
+// ─── Choice system ─────────────────────────────────────────────
+function renderChoices(choices) {
+  const area = document.getElementById('choices-area');
+  area.innerHTML = '';
+  const labels = ['A','B','C','D'];
+  (choices || []).forEach((choice, i) => {
+    const btn = document.createElement('div');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<div class="choice-label">${labels[i]}</div><div class="choice-text">${choice.text}</div>`;
+    btn.onclick = () => selectChoice(i);
+    area.appendChild(btn);
+  });
+}
 
-    <!-- EDITOR -->
-    <div class="editor-section">
-      <div class="editor-label">✏️ เขียนโค้ดของคุณ</div>
-      <div class="editor-wrap">
-        <div class="editor-toolbar">
-          <span class="editor-lang">Python 🐍 + NumPy / pandas</span>
-          <div class="editor-actions">
-            <button class="btn-icon" onclick="resetCode()" title="Reset">↩ Reset</button>
-          </div>
-        </div>
-        <textarea id="code-editor" spellcheck="false">${escHtml(lv.starter)}</textarea>
-      </div>
-    </div>
-
-    <!-- ACTIONS -->
-    <div class="action-row">
-      <button class="btn-run" id="run-btn" onclick="runCode()">▶ รันโค้ด</button>
-      <button class="btn-hint" onclick="showNextHint(${n})">💡 คำใบ้</button>
-      ${n > 1 ? `<button class="btn-reset" onclick="navigateTo(${n-1})">← ด่านก่อนหน้า</button>` : ''}
-      ${n < 28 ? `<button class="btn-reset" onclick="navigateTo(${n+1})">ด่านถัดไป →</button>` : ''}
-    </div>
-
-    <!-- HINT BOX -->
-    <div class="hint-box" id="hint-box">
-      <h4>💡 คำใบ้</h4>
-      <p id="hint-text"></p>
-    </div>
-
-    <!-- RESULTS -->
-    <div class="results-section" id="results-section">
-      <div id="results-summary"></div>
-      <div id="results-detail"></div>
-    </div>
-
-    <!-- COMPLETE -->
-    <div class="complete-banner" id="complete-banner">
-      <div style="font-size:2.5rem;margin-bottom:8px;">🎉</div>
-      <h2>ผ่านด่านที่ ${n}!</h2>
-      <p id="complete-sub">ได้รับ ${lv.xp} XP</p>
-      ${n < 28 ? `<button class="btn-next" onclick="navigateTo(${n+1})">ด่านถัดไป →</button>` : '<button class="btn-next" onclick="showFinish()">🏆 จบ AI Quest!</button>'}
-    </div>
-  `;
-
-  if (!hintIndex[n]) hintIndex[n] = 0;
-  if (!attempts[n]) attempts[n] = 0;
-
-  main.scrollTop = 0;
+function selectChoice(idx) {
+  selectedChoice = idx;
+  document.querySelectorAll('.choice-btn').forEach((b, i) => b.classList.toggle('selected', i === idx));
 }
 
 // ═══════════════════════════════════════════════════════════════
-// RUN CODE
+// RUN (just run + show output — no modal)
 // ═══════════════════════════════════════════════════════════════
 async function runCode() {
   const code = document.getElementById('code-editor').value;
-  const lv = LEVELS[currentLevel];
-  const btn = document.getElementById('run-btn');
+  const lv   = LEVELS[currentLevel];
+  const btn  = document.getElementById('run-btn');
   btn.disabled = true; btn.textContent = '⏳ กำลังรัน...';
 
-  attempts[currentLevel] = (attempts[currentLevel] || 0) + 1;
-
-  if (!pyodideReady) {
-    showLoading('กำลังโหลด Python (ครั้งแรกอาจนาน ~30 วินาที)...');
-  }
+  if (!pyodideReady) showLoading('กำลังโหลด Python (ครั้งแรกอาจนาน ~30 วินาที)...');
 
   try {
-    const needsNumpy  = code.includes('numpy') || code.includes('import np');
-    const needsPandas = code.includes('pandas') || code.includes(' pd');
     const pkgs = [];
-    if (needsNumpy)  pkgs.push('numpy');
-    if (needsPandas) pkgs.push('pandas');
+    if (code.includes('numpy') || code.includes(' np'))    pkgs.push('numpy');
+    if (code.includes('pandas') || code.includes(' pd'))   pkgs.push('pandas');
 
     const results = await CodeQuestEngine.validate('python', code, lv.tests, { packages: pkgs });
     pyodideReady = true;
     hideLoading();
-    displayResults(results);
+
+    const ob = document.getElementById('output-body');
+    const r  = results[0];
+    if (r) {
+      ob.textContent = r.output || '(ไม่มี output)';
+      ob.className   = `output-body${r.error ? ' error' : ''}`;
+    }
   } catch(err) {
     hideLoading();
-    displayError(err.message || 'เกิดข้อผิดพลาด');
+    const ob = document.getElementById('output-body');
+    ob.textContent = err.message || 'เกิดข้อผิดพลาด';
+    ob.className   = 'output-body error';
   }
 
   btn.disabled = false; btn.textContent = '▶ รันโค้ด';
 }
 
-function displayResults(results) {
-  const section   = document.getElementById('results-section');
-  const summary   = document.getElementById('results-summary');
-  const detail    = document.getElementById('results-detail');
-  const complete  = document.getElementById('complete-banner');
+// ═══════════════════════════════════════════════════════════════
+// SUBMIT (validate + modal)
+// ═══════════════════════════════════════════════════════════════
+async function submitCode() {
+  const code = document.getElementById('code-editor').value;
+  const lv   = LEVELS[currentLevel];
+  const btn  = document.getElementById('run-btn');
+  btn.disabled = true;
 
-  section.style.display = 'block';
+  attempts[currentLevel] = (attempts[currentLevel] || 0) + 1;
 
-  const { earned, total, percentage, allPassed } = CodeQuestEngine.calculateScore(results);
+  if (!pyodideReady) showLoading('กำลังโหลด Python (ครั้งแรกอาจนาน ~30 วินาที)...');
 
-  let cls, icon, title, sub;
-  if (allPassed) {
-    cls = 'all-pass'; icon = '🏆';
-    title = 'ผ่านทุก test case!';
-    sub = `ได้ ${earned}/${total} คะแนน`;
-  } else if (earned > 0) {
-    cls = 'partial'; icon = '⚡';
-    title = `ผ่าน ${results.filter(r=>r.passed).length}/${results.length} test case`;
-    sub = `ได้ ${earned}/${total} คะแนน (${percentage}%)`;
-  } else {
-    cls = 'fail'; icon = '❌';
-    title = 'ยังไม่ผ่าน';
-    sub = 'ลองอ่านคำใบ้แล้วแก้ใหม่นะ';
+  try {
+    const pkgs = [];
+    if (code.includes('numpy') || code.includes(' np'))    pkgs.push('numpy');
+    if (code.includes('pandas') || code.includes(' pd'))   pkgs.push('pandas');
+
+    const results = await CodeQuestEngine.validate('python', code, lv.tests, { packages: pkgs });
+    pyodideReady = true;
+    hideLoading();
+
+    // Show output
+    const ob = document.getElementById('output-body');
+    const r  = results[0];
+    if (r) {
+      ob.textContent = r.output || '(ไม่มี output)';
+      ob.className   = `output-body${r.error ? ' error' : ''}`;
+    }
+
+    const { allPassed } = CodeQuestEngine.calculateScore(results);
+    showResult(allPassed, lv);
+  } catch(err) {
+    hideLoading();
+    const ob = document.getElementById('output-body');
+    ob.textContent = err.message || 'เกิดข้อผิดพลาด';
+    ob.className   = 'output-body error';
+    showResult(false, lv, err.message);
   }
 
-  summary.innerHTML = `
-    <div class="results-summary ${cls}">
-      <div class="results-icon">${icon}</div>
-      <div class="results-text">
-        <div class="results-title">${title}</div>
-        <div class="results-sub">${sub}</div>
-      </div>
-      <div class="score-badge">${earned}/${total} pts</div>
-    </div>`;
+  btn.disabled = false;
+}
 
-  detail.innerHTML = CodeQuestEngine.renderResults(results);
+function submitChoice() {
+  const lv = LEVELS[currentLevel];
+  if (selectedChoice < 0) return;
+  const correct = lv.choices[selectedChoice].correct;
+  const btns = document.querySelectorAll('.choice-btn');
+  lv.choices.forEach((c, i) => {
+    if (c.correct) btns[i].classList.add('correct');
+    else if (i === selectedChoice) btns[i].classList.add('wrong');
+  });
+  setTimeout(() => {
+    showResult(correct, lv);
+    btns.forEach(b => b.classList.remove('correct','wrong','selected'));
+  }, 800);
+}
 
-  if (allPassed) {
-    complete.classList.add('visible');
+function showResult(success, lv, errorMsg) {
+  const modal   = document.getElementById('result-modal');
+  const content = document.getElementById('modal-content');
+  if (success) {
+    content.className = 'modal-content';
+    document.getElementById('modal-icon').textContent  = currentLevel === 28 ? '🏆' : '🎉';
+    document.getElementById('modal-title').textContent = 'ผ่านด่าน!';
+    document.getElementById('modal-text').innerHTML    = lv.successMsg || `ผ่านด่าน ${currentLevel}!`;
+    const earned = Math.max(0, lv.xp - xpPenalty);
+    document.getElementById('modal-xp').textContent   = `+${earned} XP`;
+    const btn = document.getElementById('modal-btn');
+    if (currentLevel === 28) {
+      btn.textContent = '🏆 จบ AI Quest!';
+      btn.className   = 'btn-next-modal';
+      btn.onclick     = () => { closeModal(); showScreen('victory-screen'); };
+    } else {
+      btn.textContent = 'ด่านถัดไป →';
+      btn.className   = 'btn-next-modal';
+      btn.onclick     = () => { closeModal(); navigateTo(currentLevel + 1); };
+    }
     saveProgress();
-  }
-}
-
-function displayError(msg) {
-  const section = document.getElementById('results-section');
-  const summary = document.getElementById('results-summary');
-  section.style.display = 'block';
-  summary.innerHTML = `
-    <div class="results-summary fail">
-      <div class="results-icon">❌</div>
-      <div class="results-text">
-        <div class="results-title">เกิดข้อผิดพลาด</div>
-        <div class="results-sub" style="font-family:'Fira Code',monospace;font-size:0.8rem;">${escHtml(msg)}</div>
-      </div>
-    </div>`;
-  document.getElementById('results-detail').innerHTML = '';
-}
-
-// ═══════════════════════════════════════════════════════════════
-// HINTS
-// ═══════════════════════════════════════════════════════════════
-function showNextHint(n) {
-  const lv = LEVELS[n];
-  const box  = document.getElementById('hint-box');
-  const text = document.getElementById('hint-text');
-  const idx  = hintIndex[n] || 0;
-
-  if (idx < lv.hints.length) {
-    text.textContent = lv.hints[idx];
-    box.classList.add('visible');
-    hintIndex[n] = idx + 1;
   } else {
-    text.textContent = 'ไม่มีคำใบ้เพิ่มแล้ว ลองอ่านแนวคิดด้านบนอีกครั้งนะ 😊';
+    content.className = 'modal-content fail';
+    document.getElementById('modal-icon').textContent  = '💥';
+    document.getElementById('modal-title').textContent = 'ยังไม่ถูก!';
+    document.getElementById('modal-text').textContent  = errorMsg || 'ลองรันโค้ดก่อน เทียบ output กับผลลัพธ์ที่ต้องการ แล้วแก้ไข — ใช้คำใบ้ได้นะ!';
+    document.getElementById('modal-xp').textContent    = '';
+    const btn = document.getElementById('modal-btn');
+    btn.textContent = '🔄 ลองอีกครั้ง';
+    btn.className   = 'btn-retry';
+    btn.onclick     = closeModal;
   }
+  modal.classList.add('show');
 }
+
+function closeModal() { document.getElementById('result-modal').classList.remove('show'); }
 
 // ═══════════════════════════════════════════════════════════════
 // SAVE PROGRESS
@@ -1768,33 +2115,25 @@ function saveProgress() {
   const lv = LEVELS[currentLevel];
   if (!completedLocal.has(currentLevel)) {
     completedLocal.add(currentLevel);
-    xpLocal[currentLevel] = lv.xp;
+    xpLocal[currentLevel] = Math.max(0, lv.xp - xpPenalty);
   }
 
   const saved = JSON.parse(localStorage.getItem(`cq_progress_${GAME_KEY}`) || '{}');
   saved.completed = [...completedLocal];
-  saved.xpMap = xpLocal;
-  saved.totalXp = Object.values(xpLocal).reduce((a,b) => a+b, 0);
+  saved.xpMap     = xpLocal;
+  saved.totalXp   = Object.values(xpLocal).reduce((a,b) => a+b, 0);
   localStorage.setItem(`cq_progress_${GAME_KEY}`, JSON.stringify(saved));
 
-  updateSidebarItem(currentLevel);
   updateNavXP();
 
-  // Cloud save
   if (window.CodeQuestAuth?.currentUser && window.CodeQuestProgress) {
-    const totalXp = Object.values(xpLocal).reduce((a,b) => a+b, 0);
     CodeQuestProgress.completeLevel(
       currentLevel, lv.xp,
-      hintIndex[currentLevel] || 0,
+      (hintsUsed[currentLevel] || []).length,
       attempts[currentLevel] || 1,
       lv.tests.length, lv.tests.length
     ).catch(console.warn);
   }
-}
-
-function updateSidebarItem(n) {
-  // Stage map will be rebuilt when user returns to home screen
-  // No DOM element to update inline on game screen
 }
 
 function updateNavXP() {
@@ -1811,29 +2150,19 @@ function updateNavXP() {
 function resetCode() {
   const ed = document.getElementById('code-editor');
   if (ed) ed.value = LEVELS[currentLevel].starter;
-  document.getElementById('results-section').style.display = 'none';
-  document.getElementById('complete-banner')?.classList.remove('visible');
+  const ob = document.getElementById('output-body');
+  if (ob) { ob.textContent = 'รอรันโค้ด...'; ob.className = 'output-body'; }
 }
 
 function showFinish() {
   const totalXp = Object.values(xpLocal).reduce((a,b) => a+b, 0);
-  document.getElementById('main-content').innerHTML = `
-    <div style="text-align:center;padding:80px 20px;">
-      <div style="font-size:5rem;margin-bottom:16px;">🏆🤖🎉</div>
-      <h1 style="font-size:2.5rem;font-weight:800;background:linear-gradient(135deg,#a855f7,#4ECDC4,#FFE66D);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-        จบ AI Quest แล้ว!
-      </h1>
-      <p style="color:var(--text-dim);margin:12px 0 24px;font-size:1.1rem;">
-        คุณผ่านครบ 28 ด่าน ได้รับ <strong style="color:var(--accent3)">${totalXp} XP</strong> รวมทั้งหมด!
-      </p>
-      <p style="color:var(--text-dim);font-size:0.9rem;max-width:500px;margin:0 auto 32px;">
-        ตอนนี้คุณมีพื้นฐาน Python, NumPy, pandas และ Machine Learning แล้ว<br>
-        ลองนำความรู้ไปต่อยอดสร้างโปรเจคของตัวเองได้เลย!
-      </p>
-      <a href="/index.php" class="btn-next" style="text-decoration:none;display:inline-flex;">
-        ← กลับหน้าหลัก
-      </a>
-    </div>`;
+  const titleEl = document.getElementById('victory-title');
+  const subEl   = document.getElementById('victory-sub');
+  const xpEl    = document.getElementById('victory-xp');
+  if (titleEl) titleEl.textContent = 'จบ AI Quest แล้ว!';
+  if (subEl)   subEl.textContent   = 'คุณผ่านครบ 28 ด่าน ตอนนี้คุณมีพื้นฐาน Python, NumPy, pandas และ Machine Learning แล้ว';
+  if (xpEl)    xpEl.textContent    = `รวม ${totalXp} XP`;
+  showScreen('victory-screen');
 }
 
 function showLoading(msg) {

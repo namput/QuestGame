@@ -20,99 +20,99 @@
   --success: #10b981;
   --error: #ef4444;
   --border: rgba(255,255,255,0.07);
+  --code-bg: #1e1e3f;
   --zone1: #a855f7;
   --zone2: #3b82f6;
   --zone3: #10b981;
   --zone4: #FF6B6B;
 }
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  font-family: 'Prompt', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+body { font-family: 'Prompt', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-/* ── NAV ── */
-.nav {
-  position: sticky; top: 0; z-index: 200;
-  background: rgba(15,14,23,0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(168,85,247,0.15);
-  padding: 0 20px;
-  height: 60px;
-  display: flex; align-items: center; justify-content: space-between;
+/* LOADING SCREEN */
+#loading-screen {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: var(--bg); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; z-index: 1000; transition: opacity 0.5s;
 }
-.nav-logo { font-size: 1.1rem; font-weight: 800; background: linear-gradient(135deg, #a855f7, #4ECDC4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.nav-right { display: flex; align-items: center; gap: 12px; }
-.nav-progress-text { font-size: 0.8rem; color: var(--text-dim); }
-.nav-xp { font-size: 0.85rem; font-weight: 700; color: var(--accent3); font-family: 'Fira Code', monospace; }
-.nav-btn { background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.25); color: var(--text); font-family: 'Prompt', sans-serif; font-size: 0.8rem; font-weight: 600; padding: 6px 14px; border-radius: 8px; cursor: pointer; text-decoration: none; transition: all 0.2s; }
-.nav-btn:hover { background: rgba(168,85,247,0.22); }
+.loading-logo {
+  font-size: 3rem; font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 30px; animation: pulse-glow 2s ease-in-out infinite;
+}
+@keyframes pulse-glow { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
+.loading-bar-container { width: 300px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+.loading-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 3px; transition: width 0.3s; }
+.loading-text-msg { margin-top: 15px; color: var(--text-dim); font-size: 0.9rem; }
 
-/* ── LAYOUT ── */
-.layout {
-  display: flex;
-  flex: 1;
-  height: calc(100vh - 60px);
-  overflow: hidden;
-}
+.app-container { position: relative; z-index: 1; display: none; }
 
-/* ── SIDEBAR ── */
-.sidebar {
-  width: 280px;
-  flex-shrink: 0;
-  background: rgba(26,25,50,0.8);
-  border-right: 1px solid var(--border);
-  overflow-y: auto;
-  padding: 16px 12px;
+/* TOP BAR */
+.top-bar {
+  background: rgba(26,25,50,0.9); backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 12px 30px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
 }
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.3); border-radius: 2px; }
+.logo { font-size: 1.3rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.logo span { font-size: 0.8rem; opacity: 0.7; -webkit-text-fill-color: var(--text-dim); margin-left: 8px; }
+.player-info { display: flex; align-items: center; gap: 20px; }
+.xp-bar-container { width: 160px; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+.xp-bar { height: 100%; background: linear-gradient(90deg, var(--accent3), var(--accent)); border-radius: 4px; transition: width 0.5s ease; width: 0%; }
+.xp-text { font-size: 0.8rem; color: var(--accent3); font-weight: 600; }
+.level-badge { background: linear-gradient(135deg, var(--accent), var(--accent2)); padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
 
-.zone-header {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 10px;
-  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  margin-top: 8px; margin-bottom: 4px;
-}
-.zone-header:first-child { margin-top: 0; }
-.zone-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+/* SCREENS */
+.screen { display: none; }
+.screen.active { display: block; }
 
-.level-btn {
-  display: flex; align-items: center; gap: 10px;
-  width: 100%; padding: 9px 10px; border-radius: 10px;
-  border: none; background: transparent; cursor: pointer;
-  color: var(--text-dim); font-family: 'Prompt', sans-serif;
-  font-size: 0.82rem; font-weight: 600;
-  text-align: left; transition: all 0.18s;
-  margin-bottom: 2px;
+/* HOME SCREEN */
+.home-screen { min-height: calc(100vh - 57px); display: flex; flex-direction: column; align-items: center; padding: 60px 20px; }
+.home-title {
+  font-size: 4rem; font-weight: 800; text-align: center; margin-bottom: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  animation: title-shimmer 3s ease-in-out infinite;
 }
-.level-btn:hover { background: rgba(255,255,255,0.05); color: var(--text); }
-.level-btn.active { background: rgba(168,85,247,0.15); color: var(--text); border: 1px solid rgba(168,85,247,0.3); }
-.level-btn.completed .lv-icon { color: var(--success); }
-.level-btn.completed { color: var(--text-dim); }
-.lv-num { font-size: 0.7rem; font-family: 'Fira Code', monospace; opacity: 0.6; min-width: 20px; }
-.lv-icon { font-size: 0.85rem; flex-shrink: 0; }
-.lv-title { flex: 1; line-height: 1.3; }
-.lv-xp-badge { font-size: 0.65rem; background: rgba(255,230,109,0.12); color: var(--accent3); padding: 2px 6px; border-radius: 5px; font-family: 'Fira Code', monospace; white-space: nowrap; }
+@keyframes title-shimmer { 0%,100% { filter: hue-rotate(0deg); } 50% { filter: hue-rotate(30deg); } }
+.home-subtitle { font-size: 1.2rem; color: var(--text-dim); text-align: center; margin-bottom: 50px; }
+.home-subtitle strong { color: var(--accent2); }
 
-/* ── MAIN ── */
-.main {
-  flex: 1;
-  overflow-y: auto;
-  padding: 28px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+/* STAGE MAP */
+.stage-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; max-width: 900px; width: 100%; margin-bottom: 30px; }
+.stage-node {
+  background: var(--card); border: 2px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 20px 14px; text-align: center;
+  cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;
 }
-.main::-webkit-scrollbar { width: 6px; }
-.main::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.2); border-radius: 3px; }
+.stage-node:hover { transform: translateY(-4px); border-color: var(--accent2); box-shadow: 0 8px 30px rgba(78,205,196,0.15); }
+.stage-node.completed { border-color: var(--success); background: linear-gradient(135deg, rgba(16,185,129,0.1), var(--card)); }
+.stage-node.current { border-color: var(--accent3); animation: current-pulse 2s ease-in-out infinite; }
+@keyframes current-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,230,109,0.3); } 50% { box-shadow: 0 0 20px 5px rgba(255,230,109,0.15); } }
+.stage-icon { font-size: 2rem; margin-bottom: 8px; }
+.stage-num { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 4px; }
+.stage-name { font-size: 0.85rem; font-weight: 600; line-height: 1.3; }
+.stage-tag { display: inline-block; margin-top: 8px; font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; background: rgba(168,85,247,0.2); color: var(--accent); }
+.stage-check { position: absolute; top: 8px; right: 8px; font-size: 1.2rem; }
+.zone-label { grid-column: 1 / -1; text-align: center; padding: 10px; margin-top: 10px; font-size: 1rem; font-weight: 700; border-radius: 10px; }
+.zone-label.zone1 { background: linear-gradient(90deg, rgba(168,85,247,0.15), transparent); color: var(--zone1); }
+.zone-label.zone2 { background: linear-gradient(90deg, rgba(59,130,246,0.15), transparent); color: var(--zone2); }
+.zone-label.zone3 { background: linear-gradient(90deg, rgba(16,185,129,0.15), transparent); color: var(--zone3); }
+.zone-label.zone4 { background: linear-gradient(90deg, rgba(255,107,107,0.15), transparent); color: var(--zone4); }
+
+/* GAME SCREEN */
+.game-screen { max-width: 900px; margin: 0 auto; padding: 30px 20px; }
+.game-header { display: flex; align-items: center; gap: 20px; margin-bottom: 25px; }
+.btn-back {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text); padding: 8px 16px; border-radius: 10px; cursor: pointer;
+  font-family: 'Prompt', sans-serif; font-size: 0.9rem; transition: all 0.2s; white-space: nowrap;
+}
+.btn-back:hover { background: rgba(255,255,255,0.12); }
+.game-title-area { flex: 1; }
+.game-title-area h2 { font-size: 1.3rem; font-weight: 700; }
+.game-title-area .theme-badge { display: inline-block; font-size: 0.75rem; padding: 3px 10px; border-radius: 12px; margin-top: 4px; }
 
 /* ── LEVEL HEADER ── */
 .level-header {
@@ -276,47 +276,64 @@ textarea#code-editor {
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-text { color: var(--text-dim); font-size: 0.9rem; }
 
-/* ── RESPONSIVE ── */
 @media (max-width: 768px) {
-  .sidebar { display: none; }
-  .main { padding: 16px; }
+  .stage-map { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .home-title { font-size: 2.5rem; }
+  .game-screen { padding: 15px; }
+  .top-bar { padding: 10px 16px; }
+  .player-info .xp-bar-container { display: none; }
 }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav">
-  <div style="display:flex;align-items:center;gap:12px">
-    <a href="/index.php" class="nav-btn" style="font-size:0.78rem;padding:5px 12px">← กลับ</a>
-    <div class="nav-logo">🤖 AI Quest</div>
-  </div>
-  <div class="nav-right">
-    <span class="nav-progress-text" id="nav-progress">ด่าน <span id="cur-level">1</span>/28</span>
-    <span class="nav-xp" id="nav-xp">0 XP</span>
-    <button id="auth-btn" onclick="CodeQuestAuth.openModal()" class="nav-btn">👤 เข้าสู่ระบบ</button>
-    <div id="user-info" style="display:none;align-items:center;gap:8px">
-      <span id="user-name" style="font-size:0.82rem;color:#fff;font-family:'Prompt',sans-serif;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
-      <button id="logout-btn" onclick="CodeQuestAuth.signOut()" class="nav-btn" style="font-size:0.75rem;padding:4px 10px;color:#94a1b2">ออก</button>
-    </div>
-  </div>
-</nav>
-
-<!-- LAYOUT -->
-<div class="layout">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar"></aside>
-
-  <!-- MAIN -->
-  <main class="main" id="main-content">
-    <!-- Populated by JS -->
-  </main>
+<!-- LOADING SCREEN -->
+<div id="loading-screen">
+  <div class="loading-logo">🤖 AI Quest</div>
+  <div class="loading-bar-container"><div class="loading-bar" id="loading-bar"></div></div>
+  <div class="loading-text-msg" id="loading-msg">กำลังโหลด...</div>
 </div>
 
-<!-- AI TUTOR BUTTON (แสดงเมื่อ login แล้ว) -->
-<div id="tutor-fab" style="display:none;position:fixed;bottom:24px;right:24px;z-index:500;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
-  <a href="credits.php" id="credits-link" style="font-size:0.72rem;color:var(--accent3);background:rgba(255,230,109,0.1);border:1px solid rgba(255,230,109,0.2);padding:4px 10px;border-radius:20px;text-decoration:none;display:none;">
+<!-- APP -->
+<div class="app-container" id="app">
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <a href="/index.php" style="text-decoration:none;color:#94a1b2;font-family:Prompt,sans-serif;font-size:0.8rem;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);white-space:nowrap;transition:all 0.2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a1b2'">← กลับ</a>
+    <div class="logo">🤖 AI Quest <span>ผจญภัยแดนโค้ด</span></div>
+    <div class="player-info">
+      <div class="xp-text" id="nav-xp">0 XP</div>
+      <div class="xp-bar-container"><div class="xp-bar" id="xp-bar-fill"></div></div>
+      <div class="level-badge" id="nav-progress">ด่าน 1/28</div>
+    </div>
+  </div>
+
+  <!-- HOME SCREEN -->
+  <div class="screen active" id="home-screen">
+    <div class="home-screen">
+      <div class="home-title">AI Quest</div>
+      <div class="home-subtitle">เรียน Python, NumPy, pandas &amp; Machine Learning ผ่าน <strong>28 ด่าน</strong>!</div>
+      <div class="stage-map" id="stage-map"></div>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="screen" id="game-screen">
+    <div class="game-screen">
+      <div class="game-header">
+        <button class="btn-back" onclick="goHome()">← กลับ</button>
+        <div class="game-title-area">
+          <h2 id="game-stage-title"></h2>
+          <div class="theme-badge" id="game-theme-badge"></div>
+        </div>
+      </div>
+      <div id="main-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- AI TUTOR FAB -->
+<div id="tutor-fab" style="display:none;position:fixed;bottom:24px;right:24px;z-index:500;flex-direction:column;align-items:flex-end;gap:8px;">
+  <a href="/credits.php" id="credits-link" style="font-size:0.72rem;color:var(--accent3);background:rgba(255,230,109,0.1);border:1px solid rgba(255,230,109,0.2);padding:4px 10px;border-radius:20px;text-decoration:none;display:none;">
     💳 <span id="fab-credits">0</span> เครดิต
   </a>
   <button id="tutor-btn" onclick="openTutor()"
@@ -341,12 +358,13 @@ textarea#code-editor {
         style="background:var(--accent);border:none;color:#fff;padding:0 14px;border-radius:10px;cursor:pointer;font-family:'Prompt',sans-serif;font-weight:700;font-size:0.85rem;">ส่ง</button>
     </div>
     <div style="padding:6px 14px 10px;font-size:0.7rem;color:var(--text-dim);text-align:center;">
-      1 คำถาม = 1 เครดิต · <a href="credits.php" style="color:var(--accent);">เติมเครดิต</a>
+      1 คำถาม = 1 เครดิต · <a href="/credits.php" style="color:var(--accent);">เติมเครดิต</a>
     </div>
   </div>
 </div>
 
-<!-- LOADING -->
+<!-- PYODIDE LOADING OVERLAY -->
+<div class="loading-overlay" id="loading">
   <div class="spinner"></div>
   <div class="loading-text" id="loading-text">กำลังโหลด Python...</div>
 </div>
@@ -1321,27 +1339,29 @@ async function boot() {
   completedLocal = new Set(saved.completed || []);
   xpLocal = saved.xpMap || {};
 
-  buildSidebar();
-  navigateTo(1);
+  // Build home screen stage map
+  buildStageMap();
   updateNavXP();
+
+  // Show app, hide loading screen
+  const ls = document.getElementById('loading-screen');
+  ls.style.opacity = '0';
+  setTimeout(() => {
+    ls.style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  }, 500);
 
   // Auth init
   if (window.CodeQuestAuth) await CodeQuestAuth.init();
+  if (window.CodeQuestAuth?.currentUser) await loadCredits();
 
-  // Load credits if logged in
-  if (window.CodeQuestAuth?.currentUser) {
-    await loadCredits();
-  }
-
-  // Preload Pyodide in background
-  showLoading('กำลังโหลด Python (Pyodide)...');
+  // Preload Pyodide silently in background
   try {
     await CodeQuestEngine.preloadPyodide(['numpy', 'pandas']);
     pyodideReady = true;
   } catch(e) {
     console.warn('Pyodide preload failed:', e);
   }
-  hideLoading();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1384,7 +1404,7 @@ function openTutor() {
   }
   if (userCredits <= 0) {
     if (confirm('เครดิตหมดแล้ว ต้องการเติมเครดิตไหม?')) {
-      window.open('credits.php', '_blank');
+      window.open('/credits.php', '_blank');
     }
     return;
   }
@@ -1420,7 +1440,7 @@ async function sendTutorMsg() {
   const text = input?.value.trim();
   if (!text) return;
   if (userCredits <= 0) {
-    if (confirm('เครดิตหมดแล้ว ต้องการเติมเครดิตไหม?')) window.open('credits.php', '_blank');
+    if (confirm('เครดิตหมดแล้ว ต้องการเติมเครดิตไหม?')) window.open('/credits.php', '_blank');
     return;
   }
 
@@ -1501,26 +1521,38 @@ async function sendTutorMsg() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SIDEBAR
+// STAGE MAP
 // ═══════════════════════════════════════════════════════════════
-function buildSidebar() {
-  const sb = document.getElementById('sidebar');
+function buildStageMap() {
+  const map = document.getElementById('stage-map');
+  if (!map) return;
   let html = '';
   for (const zone of ZONES) {
-    html += `<div class="zone-header"><div class="zone-dot" style="background:${zone.color}"></div>${zone.emoji} ${zone.name}</div>`;
+    html += `<div class="zone-label zone${zone.id}">${zone.emoji} ${zone.name}</div>`;
     for (const n of zone.levels) {
       const lv = LEVELS[n];
       const done = completedLocal.has(n);
-      html += `
-        <button class="level-btn${done ? ' completed' : ''}" id="lv-btn-${n}" onclick="navigateTo(${n})">
-          <span class="lv-num">${n}</span>
-          <span class="lv-icon">${done ? '✅' : '⬜'}</span>
-          <span class="lv-title">${lv.title}</span>
-          <span class="lv-xp-badge">${lv.xp}XP</span>
-        </button>`;
+      html += `<div class="stage-node${done ? ' completed' : ''}" onclick="navigateTo(${n})">
+        ${done ? '<div class="stage-check">✅</div>' : ''}
+        <div class="stage-icon">${zone.emoji}</div>
+        <div class="stage-num">ด่าน ${n}</div>
+        <div class="stage-name">${lv.title}</div>
+        <div class="stage-tag">${lv.diff} · ${lv.xp}XP</div>
+      </div>`;
     }
   }
-  sb.innerHTML = html;
+  map.innerHTML = html;
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function goHome() {
+  showScreen('home-screen');
+  buildStageMap();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1528,11 +1560,16 @@ function buildSidebar() {
 // ═══════════════════════════════════════════════════════════════
 function navigateTo(n) {
   currentLevel = n;
-  document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
-  const btn = document.getElementById(`lv-btn-${n}`);
-  if (btn) { btn.classList.add('active'); btn.scrollIntoView({ block: 'nearest' }); }
+  const lv = LEVELS[n];
+  const zone = ZONES.find(z => z.id === lv.zone);
 
-  document.getElementById('cur-level').textContent = n;
+  document.getElementById('game-stage-title').textContent = `ด่าน ${n}: ${lv.title}`;
+  const badge = document.getElementById('game-theme-badge');
+  badge.textContent = `${zone.emoji} ${zone.name}`;
+  badge.style.cssText = `background:${zone.color}22;color:${zone.color};border:1px solid ${zone.color}44;padding:3px 10px;border-radius:12px;font-size:0.75rem;`;
+  document.getElementById('nav-progress').textContent = `ด่าน ${n}/28`;
+
+  showScreen('game-screen');
   renderLevel(n);
 }
 
@@ -1756,17 +1793,16 @@ function saveProgress() {
 }
 
 function updateSidebarItem(n) {
-  const btn = document.getElementById(`lv-btn-${n}`);
-  if (btn) {
-    btn.classList.add('completed');
-    const icon = btn.querySelector('.lv-icon');
-    if (icon) icon.textContent = '✅';
-  }
+  // Stage map will be rebuilt when user returns to home screen
+  // No DOM element to update inline on game screen
 }
 
 function updateNavXP() {
   const total = Object.values(xpLocal).reduce((a,b) => a+b, 0);
-  document.getElementById('nav-xp').textContent = `${total} XP`;
+  const el = document.getElementById('nav-xp');
+  if (el) el.textContent = `${total} XP`;
+  const bar = document.getElementById('xp-bar-fill');
+  if (bar) bar.style.width = Math.min(100, (total / 2800) * 100) + '%';
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1794,18 +1830,21 @@ function showFinish() {
         ตอนนี้คุณมีพื้นฐาน Python, NumPy, pandas และ Machine Learning แล้ว<br>
         ลองนำความรู้ไปต่อยอดสร้างโปรเจคของตัวเองได้เลย!
       </p>
-      <a href="index.php" class="btn-next" style="text-decoration:none;display:inline-flex;">
+      <a href="/index.php" class="btn-next" style="text-decoration:none;display:inline-flex;">
         ← กลับหน้าหลัก
       </a>
     </div>`;
 }
 
 function showLoading(msg) {
-  document.getElementById('loading-text').textContent = msg;
-  document.getElementById('loading').classList.add('visible');
+  const el = document.getElementById('loading-text');
+  if (el) el.textContent = msg;
+  const ov = document.getElementById('loading');
+  if (ov) ov.classList.add('visible');
 }
 function hideLoading() {
-  document.getElementById('loading').classList.remove('visible');
+  const ov = document.getElementById('loading');
+  if (ov) ov.classList.remove('visible');
 }
 
 function escHtml(str) {

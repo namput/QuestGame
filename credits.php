@@ -124,7 +124,7 @@ textarea.slip-note:focus { border-color:var(--accent); }
 
 <nav class="nav">
   <div class="nav-logo">💳 เติมเครดิต AI Tutor</div>
-  <a href="index.html" class="nav-btn">← หน้าหลัก</a>
+  <a href="index.php" class="nav-btn">← หน้าหลัก</a>
 </nav>
 
 <div class="page" id="page-content">
@@ -201,7 +201,7 @@ function renderLoginWall() {
       <div style="font-size:3rem;margin-bottom:16px;">🔐</div>
       <h2>กรุณาเข้าสู่ระบบก่อน</h2>
       <p>ต้องล็อกอินก่อนถึงจะเติมเครดิตได้</p>
-      <a href="index.html" class="btn-login">ไปหน้าหลัก</a>
+      <a href="index.php" class="btn-login">ไปหน้าหลัก</a>
     </div>`;
 }
 

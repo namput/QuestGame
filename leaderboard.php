@@ -363,7 +363,7 @@ body {
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-logo">🏆 Leaderboard</div>
-  <a href="index.html" class="nav-back">← กลับหน้าหลัก</a>
+  <a href="index.php" class="nav-back">← กลับหน้าหลัก</a>
 </nav>
 
 <!-- PAGE -->

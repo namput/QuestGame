@@ -90,7 +90,7 @@ form.inline input[type=text]{background:rgba(255,255,255,0.04);border:1px solid 
 </head>
 <body>
 <h1>🔑 Admin — อนุมัติเติมเครดิต</h1>
-<div class="sub">ยินดีต้อนรับ <?=htmlspecialchars($user['display_name'])?> | <a href="../index.html" style="color:var(--accent);">← กลับหน้าหลัก</a></div>
+<div class="sub">ยินดีต้อนรับ <?=htmlspecialchars($user['display_name'])?> | <a href="../index.php" style="color:var(--accent);">← กลับหน้าหลัก</a></div>
 
 <h2 style="font-size:1rem;margin-bottom:12px;">⏳ รอการอนุมัติ <span class="badge-pending"><?=count($pending)?> รายการ</span></h2>
 <table>

@@ -24,9 +24,9 @@ Options +FollowSymLinks
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
 
-    # เส้นทางที่ไม่มี extension → ลอง .html
+    # เส้นทางที่ไม่มี extension → ลอง .php
     RewriteCond %{REQUEST_URI} !\.
-    RewriteRule ^([^/]+)/?$ /$1.html [L]
+    RewriteRule ^([^/]+)/?$ /$1.php [L]
 </IfModule>
 
 # Enable compression

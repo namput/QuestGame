@@ -295,12 +295,12 @@ section { position: relative; z-index: 1; padding: 6rem 2rem; }
     <span class="logo-text">ผจญภัยแดนโค้ด</span>
   </a>
   <ul class="nav-links">
-    <li><a href="leaderboard.html">🏆 Leaderboard</a></li>
+    <li><a href="leaderboard.php">🏆 Leaderboard</a></li>
     <li><a href="#languages">ภาษา</a></li>
     <li><a href="#how-it-works">วิธีเล่น</a></li>
     <li><a href="#certificates">ใบรับรอง</a></li>
     <li><a href="#formats">รูปแบบเกม</a></li>
-    <li><a href="dashboard.html">📊 Dashboard</a></li>
+    <li><a href="dashboard.php">📊 Dashboard</a></li>
   </ul>
   <button id="auth-btn" onclick="CodeQuestAuth.openModal()" style="background:linear-gradient(135deg,#ff6b6b,#a855f7);border:none;color:#fff;padding:8px 20px;border-radius:25px;font-family:'Prompt',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;">👤 เข้าสู่ระบบ</button>
   <div id="user-info" style="display:none;align-items:center;gap:8px;color:#fff;font-family:'Prompt',sans-serif;font-size:0.85rem;"><span id="user-name"></span><button id="logout-btn" onclick="CodeQuestAuth.signOut()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#94a1b2;padding:4px 12px;border-radius:15px;font-family:'Prompt',sans-serif;font-size:0.75rem;cursor:pointer;">ออก</button></div>
@@ -318,7 +318,7 @@ section { position: relative; z-index: 1; padding: 6rem 2rem; }
   </h1>
   <p>แพลตฟอร์มสอนเขียนโค้ดภาษาไทย ผ่านเกมผจญภัย 270+ ด่าน ครอบคลุม 6 ภาษา ตรวจทักษะจริง ไม่ใช่แค่ได้ output ถูก</p>
   <div class="hero-buttons">
-    <a href="python_quest.html" class="btn-primary">&#x1F3AE; เริ่มผจญภัย Python</a>
+    <a href="python_quest.php" class="btn-primary">&#x1F3AE; เริ่มผจญภัย Python</a>
     <a href="#languages" class="btn-secondary">&#x1F4DA; ดูภาษาทั้งหมด</a>
   </div>
   <div class="hero-stats">
@@ -362,21 +362,21 @@ section { position: relative; z-index: 1; padding: 6rem 2rem; }
     <p>จากพื้นฐานถึงขั้นสูง เตรียมพร้อมสู่สายอาชีพ</p>
   </div>
   <div class="lang-grid">
-    <div class="lang-card ready reveal" onclick="location.href='python_quest.html'">
+    <div class="lang-card ready reveal" onclick="location.href='python_quest.php'">
       <span class="lang-icon">&#x1F40D;</span>
       <h3>Python</h3>
       <div class="levels">50 ด่าน | 8 Zones</div>
       <div class="desc">ภาษาแรกที่ควรเรียน ใช้ได้ทั้ง AI, Data, Web</div>
       <span class="lang-badge badge-ready">&#x2705; พร้อมเล่น</span>
     </div>
-    <div class="lang-card ready reveal" onclick="location.href='htmlcss_quest.html'">
+    <div class="lang-card ready reveal" onclick="location.href='htmlcss_quest.php'">
       <span class="lang-icon">&#x1F310;</span>
       <h3>HTML / CSS</h3>
       <div class="levels">40 ด่าน | 7 Zones</div>
       <div class="desc">สร้างเว็บไซต์สวยๆ ตั้งแต่พื้นฐานถึง Responsive</div>
       <span class="lang-badge badge-ready">&#x2705; พร้อมเล่น</span>
     </div>
-    <div class="lang-card ready reveal" onclick="location.href='js_quest.html'">
+    <div class="lang-card ready reveal" onclick="location.href='js_quest.php'">
       <span class="lang-icon">&#x26A1;</span>
       <h3>JavaScript</h3>
       <div class="levels">50 ด่าน | 8 Zones</div>
@@ -390,14 +390,14 @@ section { position: relative; z-index: 1; padding: 6rem 2rem; }
       <div class="desc">ภาษาระดับองค์กร ใช้ทำ Android + Backend</div>
       <span class="lang-badge badge-later">&#x1F4C5; กำลังพัฒนา</span>
     </div>
-    <div class="lang-card ready reveal" onclick="location.href='sql_quest.html'">
+    <div class="lang-card ready reveal" onclick="location.href='sql_quest.php'">
       <span class="lang-icon">&#x1F4BE;</span>
       <h3>SQL</h3>
       <div class="levels">40 ด่าน | 6 Zones</div>
       <div class="desc">จัดการฐานข้อมูล ทักษะที่ทุกสายงาน IT ต้องมี</div>
       <span class="lang-badge badge-ready">&#x2705; พร้อมเล่น</span>
     </div>
-    <div class="lang-card ready reveal" onclick="location.href='ai_quest.html'" style="border-color:rgba(168,85,247,0.4); background: linear-gradient(145deg, #1a1932, #1e1040);">
+    <div class="lang-card ready reveal" onclick="location.href='ai_quest.php'" style="border-color:rgba(168,85,247,0.4); background: linear-gradient(145deg, #1a1932, #1e1040);">
       <span class="lang-icon">🤖</span>
       <h3>AI Quest <span style="font-size:.7rem;background:linear-gradient(135deg,#a855f7,#4ecdc4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">NEW</span></h3>
       <div class="levels">40 ด่าน | 7 Zones</div>
@@ -483,9 +483,9 @@ section { position: relative; z-index: 1; padding: 6rem 2rem; }
   <h2 class="reveal">พร้อมเริ่มผจญภัยแล้วหรือยัง?</h2>
   <p class="reveal">เลือกวิชาที่สนใจ เริ่มเล่นได้ทันที ฟรี ไม่ต้องสมัคร!</p>
   <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;" class="reveal">
-    <a href="python_quest.html" class="btn-primary" style="font-size:1.1rem;">🐍 Python</a>
-    <a href="ai_quest.html" class="btn-primary" style="font-size:1.1rem;background:linear-gradient(135deg,#7c3aed,#4ecdc4);">🤖 AI Quest</a>
-    <a href="leaderboard.html" class="btn-secondary" style="font-size:1.1rem;">🏆 Leaderboard</a>
+    <a href="python_quest.php" class="btn-primary" style="font-size:1.1rem;">🐍 Python</a>
+    <a href="ai_quest.php" class="btn-primary" style="font-size:1.1rem;background:linear-gradient(135deg,#7c3aed,#4ecdc4);">🤖 AI Quest</a>
+    <a href="leaderboard.php" class="btn-secondary" style="font-size:1.1rem;">🏆 Leaderboard</a>
   </div>
 </div>
 

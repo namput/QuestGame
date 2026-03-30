@@ -218,10 +218,10 @@ body {
 <div class="container">
   <!-- Top Nav -->
   <nav class="top-nav">
-    <a href="index.html" class="logo">🏰 ผจญภัยแดนโค้ด</a>
+    <a href="index.php" class="logo">🏰 ผจญภัยแดนโค้ด</a>
     <div class="nav-links">
-      <a href="index.html">หน้าหลัก</a>
-      <a href="dashboard.html" style="color:var(--accent2)">Dashboard</a>
+      <a href="index.php">หน้าหลัก</a>
+      <a href="dashboard.php" style="color:var(--accent2)">Dashboard</a>
       <button class="logout-btn" id="nav-logout" onclick="handleLogout()" style="display:none">ออกจากระบบ</button>
     </div>
   </nav>
@@ -234,7 +234,7 @@ body {
       <h2>เข้าสู่ระบบเพื่อดู Dashboard</h2>
       <p>Login เพื่อเก็บ progress ข้ามอุปกรณ์ ดูสถิติ และรับใบรับรอง</p>
       <button class="btn" onclick="CodeQuestAuth.openModal()">👤 เข้าสู่ระบบ / สมัครสมาชิก</button>
-      <p class="note">หรือ <a href="index.html">เล่นเลยแบบไม่ login</a> (เก็บ progress ใน browser)</p>
+      <p class="note">หรือ <a href="index.php">เล่นเลยแบบไม่ login</a> (เก็บ progress ใน browser)</p>
     </div>
 
     <!-- Dashboard (shown when logged in) -->
@@ -289,7 +289,7 @@ body {
       <!-- Game Progress -->
       <div class="section-title">🎮 ความก้าวหน้าแต่ละเกม</div>
       <div class="games-grid">
-        <a href="python_quest.html" class="game-card python">
+        <a href="python_quest.php" class="game-card python">
           <div class="game-header">
             <div class="game-icon">🐍</div>
             <div>
@@ -303,7 +303,7 @@ body {
             <span class="xp-earned" id="py-xp">0 XP</span>
           </div>
         </a>
-        <a href="js_quest.html" class="game-card javascript">
+        <a href="js_quest.php" class="game-card javascript">
           <div class="game-header">
             <div class="game-icon">⚡</div>
             <div>
@@ -317,7 +317,7 @@ body {
             <span class="xp-earned" id="js-xp">0 XP</span>
           </div>
         </a>
-        <a href="htmlcss_quest.html" class="game-card htmlcss">
+        <a href="htmlcss_quest.php" class="game-card htmlcss">
           <div class="game-header">
             <div class="game-icon">🌐</div>
             <div>
@@ -331,7 +331,7 @@ body {
             <span class="xp-earned" id="html-xp">0 XP</span>
           </div>
         </a>
-        <a href="sql_quest.html" class="game-card sql">
+        <a href="sql_quest.php" class="game-card sql">
           <div class="game-header">
             <div class="game-icon">💾</div>
             <div>

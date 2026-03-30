@@ -291,7 +291,7 @@ textarea#code-editor {
   <div class="nav-right">
     <span class="nav-progress-text" id="nav-progress">ด่าน <span id="cur-level">1</span>/28</span>
     <span class="nav-xp" id="nav-xp">0 XP</span>
-    <a href="index.html" class="nav-btn">← หน้าหลัก</a>
+    <a href="index.php" class="nav-btn">← หน้าหลัก</a>
   </div>
 </nav>
 
@@ -309,7 +309,7 @@ textarea#code-editor {
 
 <!-- AI TUTOR BUTTON (แสดงเมื่อ login แล้ว) -->
 <div id="tutor-fab" style="display:none;position:fixed;bottom:24px;right:24px;z-index:500;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
-  <a href="credits.html" id="credits-link" style="font-size:0.72rem;color:var(--accent3);background:rgba(255,230,109,0.1);border:1px solid rgba(255,230,109,0.2);padding:4px 10px;border-radius:20px;text-decoration:none;display:none;">
+  <a href="credits.php" id="credits-link" style="font-size:0.72rem;color:var(--accent3);background:rgba(255,230,109,0.1);border:1px solid rgba(255,230,109,0.2);padding:4px 10px;border-radius:20px;text-decoration:none;display:none;">
     💳 <span id="fab-credits">0</span> เครดิต
   </a>
   <button id="tutor-btn" onclick="openTutor()"
@@ -334,7 +334,7 @@ textarea#code-editor {
         style="background:var(--accent);border:none;color:#fff;padding:0 14px;border-radius:10px;cursor:pointer;font-family:'Prompt',sans-serif;font-weight:700;font-size:0.85rem;">ส่ง</button>
     </div>
     <div style="padding:6px 14px 10px;font-size:0.7rem;color:var(--text-dim);text-align:center;">
-      1 คำถาม = 1 เครดิต · <a href="credits.html" style="color:var(--accent);">เติมเครดิต</a>
+      1 คำถาม = 1 เครดิต · <a href="credits.php" style="color:var(--accent);">เติมเครดิต</a>
     </div>
   </div>
 </div>
@@ -1377,7 +1377,7 @@ function openTutor() {
   }
   if (userCredits <= 0) {
     if (confirm('เครดิตหมดแล้ว ต้องการเติมเครดิตไหม?')) {
-      window.open('credits.html', '_blank');
+      window.open('credits.php', '_blank');
     }
     return;
   }
@@ -1413,7 +1413,7 @@ async function sendTutorMsg() {
   const text = input?.value.trim();
   if (!text) return;
   if (userCredits <= 0) {
-    if (confirm('เครดิตหมดแล้ว ต้องการเติมเครดิตไหม?')) window.open('credits.html', '_blank');
+    if (confirm('เครดิตหมดแล้ว ต้องการเติมเครดิตไหม?')) window.open('credits.php', '_blank');
     return;
   }
 
@@ -1787,7 +1787,7 @@ function showFinish() {
         ตอนนี้คุณมีพื้นฐาน Python, NumPy, pandas และ Machine Learning แล้ว<br>
         ลองนำความรู้ไปต่อยอดสร้างโปรเจคของตัวเองได้เลย!
       </p>
-      <a href="index.html" class="btn-next" style="text-decoration:none;display:inline-flex;">
+      <a href="index.php" class="btn-next" style="text-decoration:none;display:inline-flex;">
         ← กลับหน้าหลัก
       </a>
     </div>`;

@@ -1,6 +1,29 @@
 /* ============================================================
    Shared Navbar Styles
    ============================================================ */
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nav-back-btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: #94a1b2;
+  font-family: 'Prompt', sans-serif;
+  font-size: 0.82rem;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.nav-back-btn:hover {
+  color: #fff;
+  border-color: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.06);
+}
 .navbar {
   position: fixed;
   top: 0; left: 0; right: 0;

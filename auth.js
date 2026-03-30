@@ -121,20 +121,23 @@ const CodeQuestAuth = {
   // ─── UI helpers ─────────────────────────────────────────────
 
   updateUI() {
-    const authBtn  = document.getElementById('auth-btn');
-    const userInfo = document.getElementById('user-info');
-    const userName = document.getElementById('user-name');
+    const authBtn   = document.getElementById('auth-btn');
+    const userInfo  = document.getElementById('user-info');
+    const userName  = document.getElementById('user-name');
     const syncBadge = document.getElementById('sync-badge');
+    const adminItem = document.getElementById('admin-nav-item');
 
     if (this.currentUser) {
       if (authBtn)   authBtn.style.display  = 'none';
       if (userInfo)  userInfo.style.display = 'flex';
       if (userName)  userName.textContent   = this.profile?.display_name || this.currentUser.email;
       if (syncBadge) { syncBadge.className = 'sync-badge'; syncBadge.innerHTML = '☁️ Saved'; }
+      if (adminItem) adminItem.style.display = this.profile?.is_admin ? 'list-item' : 'none';
     } else {
       if (authBtn)   authBtn.style.display  = 'inline-flex';
       if (userInfo)  userInfo.style.display = 'none';
       if (syncBadge) { syncBadge.className = 'sync-badge offline'; syncBadge.innerHTML = '💾 Local'; }
+      if (adminItem) adminItem.style.display = 'none';
     }
   },
 

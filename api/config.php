@@ -111,7 +111,7 @@ function getAuthUser(): ?array {
 
     $db  = getDB();
     $sql = 'SELECT u.id, u.email, u.display_name, u.avatar_url, u.school,
-                   u.total_xp, u.is_public
+                   u.total_xp, u.is_public, u.is_admin
             FROM sessions s
             JOIN users u ON u.id = s.user_id
             WHERE s.token = ? AND s.expires_at > NOW()

@@ -110,6 +110,7 @@ function formatUser(array $row): array {
         'school'       => $row['school'] ?? '',
         'total_xp'     => (int) $row['total_xp'],
         'is_public'    => (bool) ($row['is_public'] ?? 1),
+        'is_admin'     => (bool) ($row['is_admin'] ?? 0),
     ];
 }
 
@@ -169,7 +170,7 @@ function handleRegister(): never {
     setSessionCookie($token);
 
     $stmt = $db->prepare(
-        'SELECT id, email, display_name, avatar_url, school, total_xp, is_public
+        'SELECT id, email, display_name, avatar_url, school, total_xp, is_public, is_admin
          FROM users WHERE id = ? LIMIT 1'
     );
     $stmt->execute([$userId]);
@@ -200,7 +201,7 @@ function handleLogin(): never {
 
     $db   = getDB();
     $stmt = $db->prepare(
-        'SELECT id, email, password_hash, display_name, avatar_url, school, total_xp, is_public
+        'SELECT id, email, password_hash, display_name, avatar_url, school, total_xp, is_public, is_admin
          FROM users WHERE email = ? LIMIT 1'
     );
     $stmt->execute([$email]);
@@ -311,7 +312,7 @@ function handleUpdateProfile(): never {
 
     // Return updated user
     $stmt = $db->prepare(
-        'SELECT id, email, display_name, avatar_url, school, total_xp, is_public
+        'SELECT id, email, display_name, avatar_url, school, total_xp, is_public, is_admin
          FROM users WHERE id = ? LIMIT 1'
     );
     $stmt->execute([$user['id']]);

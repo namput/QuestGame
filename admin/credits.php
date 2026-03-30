@@ -67,10 +67,11 @@ $recent = $db->query(
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Admin: อนุมัติเครดิต</title>
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/includes/navbar.css">
 <style>
 :root{--bg:#0f0e17;--card:#1a1932;--accent:#a855f7;--text:#fffffe;--text-dim:#94a1b2;--success:#10b981;--error:#ef4444;--border:rgba(255,255,255,0.07);}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--text);padding:24px;}
+body{font-family:'Prompt',sans-serif;background:var(--bg);color:var(--text);padding:24px;padding-top:88px;}
 h1{font-size:1.4rem;font-weight:800;margin-bottom:4px;}
 .sub{color:var(--text-dim);font-size:0.85rem;margin-bottom:28px;}
 .badge-pending{background:rgba(255,230,109,0.12);color:#FFE66D;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;}
@@ -89,8 +90,9 @@ form.inline input[type=text]{background:rgba(255,255,255,0.04);border:1px solid 
 </style>
 </head>
 <body>
+<?php $activePage = 'admin'; $backUrl = '/index.php'; $backLabel = '← หน้าหลัก'; include dirname(__DIR__) . '/includes/navbar.php'; ?>
 <h1>🔑 Admin — อนุมัติเติมเครดิต</h1>
-<div class="sub">ยินดีต้อนรับ <?=htmlspecialchars($user['display_name'])?> | <a href="../index.php" style="color:var(--accent);">← กลับหน้าหลัก</a></div>
+<div class="sub">ยินดีต้อนรับ <?=htmlspecialchars($user['display_name'])?></div>
 
 <h2 style="font-size:1rem;margin-bottom:12px;">⏳ รอการอนุมัติ <span class="badge-pending"><?=count($pending)?> รายการ</span></h2>
 <table>

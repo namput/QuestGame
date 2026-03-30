@@ -6,8 +6,11 @@
 //          $backLabel  = ข้อความปุ่มย้อนกลับ (default: ← กลับ)
 // ============================================================
 $activePage = $activePage ?? '';
-$backUrl    = $backUrl    ?? '';
 $backLabel  = $backLabel  ?? '← กลับ';
+// ถ้าไม่ได้ set $backUrl แต่ไม่ใช่หน้าแรก → กลับหน้าแรกอัตโนมัติ
+if (!isset($backUrl)) {
+    $backUrl = ($activePage !== 'home' && $activePage !== '') ? '/index.php' : '';
+}
 ?>
 <nav class="navbar" id="navbar">
   <div class="navbar-left">

@@ -78,9 +78,12 @@ const CodeQuestAuth = {
   // ─── Session helpers ────────────────────────────────────────
 
   _setSession(token, user) {
-    this.token       = token;
-    this.currentUser = user;
-    this.profile     = user;
+    this.token        = token;
+    this.currentUser  = user;
+    this.profile      = user;
+    // Memoize init as already-resolved so subsequent init() calls
+    // return the user immediately — prevents spurious /me re-calls
+    this._initPromise = Promise.resolve(user);
     localStorage.setItem('cq_token', token);
     this.updateUI();
 
@@ -91,7 +94,7 @@ const CodeQuestAuth = {
     this.token        = null;
     this.currentUser  = null;
     this.profile      = null;
-    this._initPromise = null;
+    this._initPromise = null;   // allow fresh re-init on next load
     localStorage.removeItem('cq_token');
     if (typeof onAuthChange === 'function') onAuthChange('SIGNED_OUT');
   },

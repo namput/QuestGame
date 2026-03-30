@@ -179,15 +179,16 @@ function renderQR(payload, containerId) {
 // ─── INIT ─────────────────────────────────────────────────────
 async function init() {
   if (window.CodeQuestAuth) await CodeQuestAuth.init();
-  currentUser = window.CodeQuestAuth?.currentUser || null;
+  currentUser = CodeQuestAuth?.currentUser || null;
 
   if (!currentUser) {
     renderLoginWall();
     return;
   }
 
+  const token = localStorage.getItem('cq_token') || '';
   const balRes = await fetch(`${API}/credits.php?action=balance`, {
-    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('cq_token') || '') }
+    headers: { 'Authorization': 'Bearer ' + token }
   }).then(r => r.json()).catch(() => ({ credits: 0 }));
 
   renderPage(balRes.credits || 0);
@@ -206,7 +207,17 @@ function renderLoginWall() {
 }
 
 function onAuthChange(event) {
-  if (event === 'SIGNED_IN') init();
+  // After login → re-render page with user data
+  if (event === 'SIGNED_IN') {
+    currentUser = CodeQuestAuth?.currentUser || null;
+    if (currentUser) {
+      const token = localStorage.getItem('cq_token') || '';
+      fetch(`${API}/credits.php?action=balance`, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      }).then(r => r.json()).catch(() => ({ credits: 0 }))
+        .then(j => renderPage(j.credits || 0));
+    }
+  }
 }
 
 function renderPage(credits) {

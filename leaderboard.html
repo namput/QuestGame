@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏆 Leaderboard — ผจญภัยแดนโค้ด</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+<!-- auth helper (for currentUserId) -->
+<script src="auth.js"></script>
+<style>
+:root {
+  --bg: #0f0e17;
+  --card: #1a1932;
+  --accent: #FF6B6B;
+  --accent2: #4ECDC4;
+  --accent3: #FFE66D;
+  --accent4: #a855f7;
+  --text: #fffffe;
+  --text-dim: #94a1b2;
+  --success: #10b981;
+  --gold: #FFD700;
+  --silver: #C0C0C0;
+  --bronze: #CD7F32;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Prompt', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── PARTICLES ── */
+#particles-canvas {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+}
+
+/* ── NAV ── */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(15,14,23,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(78,205,196,0.12);
+  padding: 0 32px;
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo {
+  font-size: 1.25rem; font-weight: 800;
+  background: linear-gradient(135deg, var(--accent3), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  display: flex; align-items: center; gap: 8px;
+}
+.nav-back {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--text-dim); text-decoration: none;
+  font-size: 0.9rem; font-weight: 600;
+  padding: 8px 18px; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  transition: all 0.2s;
+}
+.nav-back:hover { color: var(--text); background: rgba(255,255,255,0.08); border-color: var(--accent2); }
+
+/* ── LAYOUT ── */
+.page {
+  position: relative; z-index: 1;
+  max-width: 900px; margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+/* ── HERO ── */
+.hero {
+  text-align: center; margin-bottom: 40px;
+}
+.hero-title {
+  font-size: 2.8rem; font-weight: 800; line-height: 1.2;
+  background: linear-gradient(135deg, var(--accent3), var(--accent), var(--accent4));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  animation: hue-shift 6s ease-in-out infinite;
+}
+@keyframes hue-shift { 0%,100% { filter: hue-rotate(0deg); } 50% { filter: hue-rotate(20deg); } }
+.hero-sub {
+  color: var(--text-dim); font-size: 1rem; margin-top: 8px;
+}
+.hero-stats {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 16px;
+  background: rgba(78,205,196,0.08);
+  border: 1px solid rgba(78,205,196,0.2);
+  border-radius: 40px; padding: 8px 22px;
+  font-size: 0.9rem; color: var(--accent2); font-weight: 600;
+}
+.hero-stats .pulse-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent2);
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+@keyframes pulse-dot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.7); } }
+.refresh-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.75rem; color: var(--text-dim);
+  margin-top: 6px;
+}
+.refresh-countdown {
+  background: rgba(255,255,255,0.06); padding: 2px 8px;
+  border-radius: 6px; font-family: 'Fira Code', monospace;
+  color: var(--accent3);
+}
+
+/* ── TABS ── */
+.tabs {
+  display: flex; gap: 0;
+  background: var(--card); border-radius: 16px;
+  padding: 6px; margin-bottom: 24px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.tab-btn {
+  flex: 1; background: transparent; border: none;
+  color: var(--text-dim); font-family: 'Prompt', sans-serif;
+  font-size: 0.9rem; font-weight: 600;
+  padding: 10px 16px; border-radius: 12px;
+  cursor: pointer; transition: all 0.25s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+.tab-btn.active {
+  background: linear-gradient(135deg, rgba(255,107,107,0.15), rgba(168,85,247,0.15));
+  color: var(--text);
+  box-shadow: 0 0 20px rgba(255,107,107,0.08);
+}
+.tab-btn.active::after {
+  content: '';
+}
+
+/* ── QUEST SUB-TABS ── */
+.quest-tabs {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 20px; padding: 0 2px;
+}
+.quest-tab {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text-dim); font-family: 'Prompt', sans-serif;
+  font-size: 0.82rem; font-weight: 600;
+  padding: 7px 16px; border-radius: 10px;
+  cursor: pointer; transition: all 0.2s;
+}
+.quest-tab:hover { border-color: var(--accent2); color: var(--text); }
+.quest-tab.active {
+  background: rgba(78,205,196,0.12);
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+
+/* ── TABLE CARD ── */
+.lb-card {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px; overflow: hidden;
+}
+.lb-card-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.lb-card-header h3 { font-size: 1rem; font-weight: 700; }
+.lb-count { font-size: 0.8rem; color: var(--text-dim); }
+
+/* ── ROW ── */
+.lb-row {
+  display: grid;
+  grid-template-columns: 56px 1fr 180px 90px;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.2s;
+  position: relative;
+}
+.lb-row:last-child { border-bottom: none; }
+.lb-row:hover { background: rgba(255,255,255,0.03); }
+.lb-row.is-me {
+  background: rgba(255,230,109,0.05);
+  border-left: 3px solid var(--accent3);
+}
+.lb-row.is-me::after {
+  content: 'YOU';
+  position: absolute; right: 100px;
+  font-size: 0.65rem; font-weight: 800;
+  color: var(--accent3);
+  background: rgba(255,230,109,0.12);
+  padding: 2px 7px; border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+
+/* Rank badge */
+.rank-badge {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 800;
+  flex-shrink: 0;
+}
+.rank-badge.gold {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  box-shadow: 0 0 15px rgba(255,215,0,0.4);
+  font-size: 1.1rem;
+  animation: gold-glow 2s ease-in-out infinite;
+}
+@keyframes gold-glow { 0%,100% { box-shadow: 0 0 15px rgba(255,215,0,0.4); } 50% { box-shadow: 0 0 25px rgba(255,215,0,0.7); } }
+.rank-badge.silver {
+  background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+  box-shadow: 0 0 10px rgba(192,192,192,0.3);
+}
+.rank-badge.bronze {
+  background: linear-gradient(135deg, #CD7F32, #A0522D);
+  box-shadow: 0 0 10px rgba(205,127,50,0.3);
+}
+.rank-badge.normal {
+  background: rgba(255,255,255,0.06);
+  color: var(--text-dim); font-size: 0.85rem;
+}
+
+/* User info */
+.user-cell { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem; font-weight: 700; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.08);
+}
+.user-name {
+  font-weight: 700; font-size: 0.95rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.user-school {
+  font-size: 0.75rem; color: var(--text-dim);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* XP bar */
+.xp-cell { padding-right: 16px; }
+.xp-bar-wrap {
+  height: 6px; background: rgba(255,255,255,0.07);
+  border-radius: 3px; overflow: hidden; margin-bottom: 4px;
+}
+.xp-bar-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent2), var(--accent4));
+  transition: width 0.6s ease;
+}
+.xp-num {
+  font-size: 0.75rem; font-weight: 700;
+  color: var(--accent3); font-family: 'Fira Code', monospace;
+}
+
+/* Levels done */
+.levels-cell {
+  text-align: right;
+  font-size: 0.85rem; font-weight: 600;
+  color: var(--text-dim);
+}
+.levels-cell .num { color: var(--text); font-size: 1rem; font-weight: 800; }
+
+/* ── SKELETON ── */
+.skeleton-row {
+  display: grid;
+  grid-template-columns: 56px 1fr 180px 90px;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.skel {
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  border-radius: 6px; height: 14px;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.skel-circle { width: 36px; height: 36px; border-radius: 50%; }
+.skel-avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--text-dim);
+}
+.empty-state .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+.empty-state p { font-size: 0.95rem; }
+
+/* ── TOP 3 PODIUM ── */
+.podium {
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 12px; margin-bottom: 32px;
+}
+.podium-item {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 16px 12px; border-radius: 16px;
+  background: var(--card); border: 1px solid rgba(255,255,255,0.06);
+  min-width: 120px; transition: transform 0.3s;
+}
+.podium-item:hover { transform: translateY(-4px); }
+.podium-item.rank1 {
+  border-color: rgba(255,215,0,0.3);
+  background: linear-gradient(135deg, rgba(255,215,0,0.08), var(--card));
+  padding-top: 24px;
+}
+.podium-item.rank2 {
+  border-color: rgba(192,192,192,0.2);
+  background: linear-gradient(135deg, rgba(192,192,192,0.06), var(--card));
+}
+.podium-item.rank3 {
+  border-color: rgba(205,127,50,0.2);
+  background: linear-gradient(135deg, rgba(205,127,50,0.06), var(--card));
+}
+.podium-crown { font-size: 1.5rem; }
+.podium-avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; font-weight: 800;
+  border: 3px solid rgba(255,255,255,0.1);
+}
+.podium-name { font-size: 0.9rem; font-weight: 700; text-align: center; }
+.podium-xp {
+  font-size: 0.8rem; color: var(--accent3); font-weight: 700;
+  font-family: 'Fira Code', monospace;
+}
+.podium-rank-num {
+  font-size: 0.75rem; color: var(--text-dim);
+}
+
+/* ── ERROR BANNER ── */
+.error-banner {
+  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 12px; padding: 14px 20px;
+  color: #f87171; font-size: 0.9rem; margin-bottom: 20px; display: none;
+}
+
+/* ── PANEL ── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .lb-row { grid-template-columns: 48px 1fr 80px; }
+  .xp-cell { display: none; }
+  .podium { gap: 8px; }
+  .podium-item { min-width: 90px; padding: 12px 8px; }
+  .hero-title { font-size: 2rem; }
+  .tabs { flex-wrap: wrap; }
+  .lb-row.is-me::after { display: none; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">🏆 Leaderboard</div>
+  <a href="index.html" class="nav-back">← กลับหน้าหลัก</a>
+</nav>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-title">🏆 อันดับผู้เรียน</div>
+    <div class="hero-sub">ผู้กล้าที่พิชิตด่านได้มากที่สุด</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:12px;">
+      <div class="hero-stats">
+        <div class="pulse-dot"></div>
+        <span id="total-users-text">กำลังโหลด...</span>
+      </div>
+      <div class="refresh-badge">
+        อัปเดตอัตโนมัติทุก <span class="refresh-countdown" id="refresh-countdown">60</span> วินาที
+      </div>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-banner" id="error-banner"></div>
+
+  <!-- TABS -->
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" onclick="switchTab('overall')" data-tab="overall">🌟 Overall</button>
+    <button class="tab-btn" onclick="switchTab('weekly')" data-tab="weekly">⚡ สัปดาห์นี้</button>
+    <button class="tab-btn" onclick="switchTab('quest')" data-tab="quest">📚 รายวิชา</button>
+  </div>
+
+  <!-- OVERALL -->
+  <div class="tab-panel active" id="panel-overall">
+    <div id="podium-overall"></div>
+    <div class="lb-card">
+      <div class="lb-card-header">
+        <h3>🌟 อันดับรวมทั้งหมด</h3>
+        <span class="lb-count" id="overall-count"></span>
+      </div>
+      <div id="lb-overall"></div>
+    </div>
+  </div>
+
+  <!-- WEEKLY -->
+  <div class="tab-panel" id="panel-weekly">
+    <div class="lb-card">
+      <div class="lb-card-header">
+        <h3>⚡ อันดับสัปดาห์นี้</h3>
+        <span class="lb-count" id="weekly-count"></span>
+      </div>
+      <div id="lb-weekly"></div>
+    </div>
+  </div>
+
+  <!-- QUEST -->
+  <div class="tab-panel" id="panel-quest">
+    <div class="quest-tabs" id="quest-tabs">
+      <button class="quest-tab active" onclick="switchQuest('python')" data-quest="python">🐍 Python</button>
+      <button class="quest-tab" onclick="switchQuest('javascript')" data-quest="javascript">⚡ JavaScript</button>
+      <button class="quest-tab" onclick="switchQuest('htmlcss')" data-quest="htmlcss">🎨 HTML/CSS</button>
+      <button class="quest-tab" onclick="switchQuest('sql')" data-quest="sql">🗄️ SQL</button>
+      <button class="quest-tab" onclick="switchQuest('ai')" data-quest="ai">🤖 AI Quest</button>
+    </div>
+    <div class="lb-card">
+      <div class="lb-card-header">
+        <h3 id="quest-title">🐍 Python</h3>
+        <span class="lb-count" id="quest-count"></span>
+      </div>
+      <div id="lb-quest"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const API_BASE = './api';
+
+let currentUserId = null;
+let activeTab = 'overall';
+let activeQuest = 'python';
+let refreshTimer = null;
+let countdownTimer = null;
+let countdownVal = 60;
+
+const QUEST_LABELS = {
+  python:     '🐍 Python',
+  javascript: '⚡ JavaScript',
+  htmlcss:    '🎨 HTML/CSS',
+  sql:        '🗄️ SQL',
+  ai:         '🤖 AI Quest',
+};
+
+const AVATAR_COLORS = [
+  '#FF6B6B','#4ECDC4','#FFE66D','#a855f7',
+  '#3b82f6','#10b981','#f97316','#ec4899',
+  '#06b6d4','#84cc16',
+];
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+async function init() {
+  // Get current user from auth.js
+  if (window.CodeQuestAuth) {
+    await CodeQuestAuth.init();
+    currentUserId = CodeQuestAuth.currentUser?.id || null;
+  }
+
+  // Fetch total users count
+  fetchTotalUsers();
+
+  // Initial data fetch
+  await fetchOverall();
+
+  // Refresh loop
+  startRefreshCycle();
+}
+
+// ─── TOTAL USERS ──────────────────────────────────────────────────────────────
+async function fetchTotalUsers() {
+  try {
+    const res = await fetch(`${API_BASE}/leaderboard.php?type=stats`);
+    const json = await res.json();
+    const n = json.total_users || 0;
+    document.getElementById('total-users-text').textContent =
+      n > 0 ? `${n.toLocaleString()} คนกำลังเรียนอยู่` : 'ผู้เรียนทั่วประเทศ';
+  } catch(e) {
+    document.getElementById('total-users-text').textContent = 'ผู้เรียนทั่วประเทศ';
+  }
+}
+
+// ─── TAB SWITCHING ────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+
+  if (tab === 'overall') fetchOverall();
+  else if (tab === 'weekly') fetchWeekly();
+  else if (tab === 'quest') fetchQuest(activeQuest);
+}
+
+function switchQuest(quest) {
+  activeQuest = quest;
+  document.querySelectorAll('.quest-tab').forEach(b => b.classList.toggle('active', b.dataset.quest === quest));
+  document.getElementById('quest-title').textContent = QUEST_LABELS[quest] || quest;
+  fetchQuest(quest);
+}
+
+// ─── DATA FETCHING ────────────────────────────────────────────────────────────
+async function fetchOverall() {
+  const container = document.getElementById('lb-overall');
+  showSkeleton(container, 10);
+
+  try {
+    const res = await fetch(`${API_BASE}/leaderboard.php?type=overall&limit=50`);
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    const data = json.data || [];
+    renderList(container, data, 'overall');
+    renderPodium(document.getElementById('podium-overall'), data);
+    const cnt = document.getElementById('overall-count');
+    if (cnt) cnt.textContent = `${data.length} คน`;
+  } catch(e) {
+    showError(e.message);
+    showEmptyState(container);
+  }
+}
+
+async function fetchWeekly() {
+  const container = document.getElementById('lb-weekly');
+  showSkeleton(container, 10);
+
+  try {
+    const res = await fetch(`${API_BASE}/leaderboard.php?type=weekly&limit=50`);
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    const data = json.data || [];
+    renderList(container, data, 'weekly');
+    const cnt = document.getElementById('weekly-count');
+    if (cnt) cnt.textContent = `${data.length} คน`;
+  } catch(e) {
+    showError(e.message);
+    showEmptyState(container);
+  }
+}
+
+async function fetchQuest(questType) {
+  const container = document.getElementById('lb-quest');
+  showSkeleton(container, 10);
+
+  try {
+    const res = await fetch(`${API_BASE}/leaderboard.php?type=quest&game=${encodeURIComponent(questType)}&limit=50`);
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    const data = json.data || [];
+    renderList(container, data, 'quest');
+    const cnt = document.getElementById('quest-count');
+    if (cnt) cnt.textContent = `${data.length} คน`;
+  } catch(e) {
+    showError(e.message);
+    showEmptyState(container);
+  }
+}
+
+// ─── RENDER LIST ─────────────────────────────────────────────────────────────
+function renderList(container, rows, mode) {
+  if (!rows.length) { showEmptyState(container); return; }
+  hideError();
+
+  const maxXP = Math.max(...rows.map(r => r.total_xp || r.xp || 0), 1);
+
+  container.innerHTML = rows.map((row, i) => {
+    const rank    = row.rank || (i + 1);
+    const name    = esc(row.display_name || row.name || 'ผู้เรียน');
+    const school  = esc(row.school || row.institution || '');
+    const xp      = row.total_xp || row.weekly_xp || row.xp || 0;
+    const levels  = row.total_levels_done || row.levels_this_week || row.max_level_reached || row.levels_completed || 0;
+    const userId  = row.user_id || row.id || '';
+    const isMe    = userId && userId === currentUserId;
+    const initials = getInitials(row.display_name || row.name || '?');
+    const color   = AVATAR_COLORS[(name.charCodeAt(0) || 0) % AVATAR_COLORS.length];
+    const pct     = Math.round((xp / maxXP) * 100);
+
+    return `
+      <div class="lb-row${isMe ? ' is-me' : ''}">
+        <div style="display:flex;align-items:center;">
+          ${rankBadge(rank)}
+        </div>
+        <div class="user-cell">
+          <div class="avatar" style="background:${color}22;border-color:${color}44;color:${color};">${initials}</div>
+          <div style="min-width:0;">
+            <div class="user-name">${name}</div>
+            ${school ? `<div class="user-school">${school}</div>` : ''}
+          </div>
+        </div>
+        <div class="xp-cell">
+          <div class="xp-bar-wrap">
+            <div class="xp-bar-fill" style="width:${pct}%"></div>
+          </div>
+          <div class="xp-num">${xp.toLocaleString()} XP</div>
+        </div>
+        <div class="levels-cell">
+          <div class="num">${levels}</div>
+          <div style="font-size:0.7rem;">ด่าน</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Animate bars in
+  requestAnimationFrame(() => {
+    container.querySelectorAll('.xp-bar-fill').forEach(b => {
+      const w = b.style.width;
+      b.style.width = '0';
+      setTimeout(() => { b.style.width = w; }, 50);
+    });
+  });
+}
+
+// ─── PODIUM ───────────────────────────────────────────────────────────────────
+function renderPodium(container, rows) {
+  if (!rows.length) { container.innerHTML = ''; return; }
+  const top3 = rows.slice(0, 3);
+  if (top3.length < 1) { container.innerHTML = ''; return; }
+
+  // Reorder: 2nd, 1st, 3rd
+  const order = [top3[1], top3[0], top3[2]].filter(Boolean);
+  const rankClass = (r) => r.rank === 1 ? 'rank1' : r.rank === 2 ? 'rank2' : 'rank3';
+  const crown = (r) => r.rank === 1 ? '👑' : r.rank === 2 ? '🥈' : '🥉';
+
+  container.innerHTML = `
+    <div class="podium">
+      ${order.map(row => {
+        const name    = esc(row.display_name || row.name || 'ผู้เรียน');
+        const xp      = (row.total_xp || row.xp || 0).toLocaleString();
+        const initials = getInitials(name);
+        const color   = AVATAR_COLORS[(name.charCodeAt(0) || 0) % AVATAR_COLORS.length];
+        return `
+          <div class="podium-item ${rankClass(row)}">
+            <div class="podium-crown">${crown(row)}</div>
+            <div class="podium-avatar" style="background:${color}22;border-color:${color}55;color:${color};">${initials}</div>
+            <div class="podium-name">${name}</div>
+            <div class="podium-xp">${xp} XP</div>
+            <div class="podium-rank-num">อันดับ ${row.rank}</div>
+          </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ─── SKELETON ─────────────────────────────────────────────────────────────────
+function showSkeleton(container, n = 8) {
+  container.innerHTML = Array(n).fill(0).map(() => `
+    <div class="skeleton-row">
+      <div class="skel skel-circle"></div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="skel skel-avatar"></div>
+        <div style="flex:1;">
+          <div class="skel" style="width:60%;margin-bottom:6px;"></div>
+          <div class="skel" style="width:40%;height:10px;"></div>
+        </div>
+      </div>
+      <div style="padding-right:16px;">
+        <div class="skel" style="width:100%;margin-bottom:6px;height:6px;border-radius:3px;"></div>
+        <div class="skel" style="width:50%;height:10px;"></div>
+      </div>
+      <div>
+        <div class="skel" style="width:70%;margin:0 auto;height:18px;"></div>
+      </div>
+    </div>`).join('');
+}
+
+function showEmptyState(container) {
+  container.innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <p>ยังไม่มีข้อมูลในส่วนนี้</p>
+      <p style="margin-top:8px;font-size:0.8rem;">เริ่มเล่นเกมเพื่อขึ้น Leaderboard!</p>
+    </div>`;
+}
+
+// ─── ERROR ────────────────────────────────────────────────────────────────────
+function showError(msg) {
+  const b = document.getElementById('error-banner');
+  b.textContent = '⚠️ ไม่สามารถโหลดข้อมูลได้: ' + msg;
+  b.style.display = 'block';
+}
+function hideError() {
+  document.getElementById('error-banner').style.display = 'none';
+}
+
+// ─── AUTO REFRESH ─────────────────────────────────────────────────────────────
+function startRefreshCycle() {
+  countdownVal = 60;
+  clearInterval(refreshTimer);
+  clearInterval(countdownTimer);
+
+  countdownTimer = setInterval(() => {
+    countdownVal--;
+    const el = document.getElementById('refresh-countdown');
+    if (el) el.textContent = countdownVal;
+    if (countdownVal <= 0) {
+      countdownVal = 60;
+      refreshCurrentTab();
+    }
+  }, 1000);
+}
+
+function refreshCurrentTab() {
+  if (activeTab === 'overall') fetchOverall();
+  else if (activeTab === 'weekly') fetchWeekly();
+  else if (activeTab === 'quest') fetchQuest(activeQuest);
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function rankBadge(rank) {
+  if (rank === 1) return `<div class="rank-badge gold">🥇</div>`;
+  if (rank === 2) return `<div class="rank-badge silver">🥈</div>`;
+  if (rank === 3) return `<div class="rank-badge bronze">🥉</div>`;
+  return `<div class="rank-badge normal">${rank}</div>`;
+}
+
+function getInitials(name) {
+  const clean = (name || '').trim();
+  if (!clean) return '?';
+  const parts = clean.split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  if (clean.length >= 2) return clean.slice(0, 2).toUpperCase();
+  return clean[0].toUpperCase();
+}
+
+function esc(str) {
+  return String(str || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── PARTICLES ────────────────────────────────────────────────────────────────
+(function initParticles() {
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  const COLORS = ['#FF6B6B','#4ECDC4','#FFE66D','#a855f7','#3b82f6'];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function createParticle() {
+    return {
+      x: Math.random() * W,
+      y: H + 10,
+      r: Math.random() * 2.5 + 0.5,
+      speed: Math.random() * 0.6 + 0.2,
+      drift: (Math.random() - 0.5) * 0.3,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      opacity: Math.random() * 0.25 + 0.05,
+      angle: 0,
+      angleSpeed: (Math.random() - 0.5) * 0.02,
+    };
+  }
+
+  function initParticlesArr() {
+    particles = [];
+    for (let i = 0; i < 60; i++) {
+      const p = createParticle();
+      p.y = Math.random() * H;
+      particles.push(p);
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.y -= p.speed;
+      p.x += p.drift;
+      p.angle += p.angleSpeed;
+      if (p.y < -10) Object.assign(particles[i], createParticle());
+      ctx.save();
+      ctx.globalAlpha = p.opacity;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    requestAnimationFrame(animate);
+  }
+
+  resize();
+  window.addEventListener('resize', () => { resize(); initParticlesArr(); });
+  initParticlesArr();
+  animate();
+})();
+
+// ─── BOOT ─────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

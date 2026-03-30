@@ -2015,13 +2015,13 @@ async function runCode() {
     const ob = document.getElementById('output-body');
     const r  = results[0];
     if (r) {
-      ob.textContent = r.output || '(ไม่มี output)';
+      ob.textContent = r.error ? `❌ Error:\n${r.error}` : (r.actual || '(ไม่มี output)');
       ob.className   = `output-body${r.error ? ' error' : ''}`;
     }
   } catch(err) {
     hideLoading();
     const ob = document.getElementById('output-body');
-    ob.textContent = err.message || 'เกิดข้อผิดพลาด';
+    ob.textContent = `❌ ${err.message || 'เกิดข้อผิดพลาด'}`;
     ob.className   = 'output-body error';
   }
 
@@ -2054,7 +2054,7 @@ async function submitCode() {
     const ob = document.getElementById('output-body');
     const r  = results[0];
     if (r) {
-      ob.textContent = r.output || '(ไม่มี output)';
+      ob.textContent = r.error ? `❌ Error:\n${r.error}` : (r.actual || '(ไม่มี output)');
       ob.className   = `output-body${r.error ? ' error' : ''}`;
     }
 
@@ -2063,7 +2063,7 @@ async function submitCode() {
   } catch(err) {
     hideLoading();
     const ob = document.getElementById('output-body');
-    ob.textContent = err.message || 'เกิดข้อผิดพลาด';
+    ob.textContent = `❌ ${err.message || 'เกิดข้อผิดพลาด'}`;
     ob.className   = 'output-body error';
     showResult(false, lv, err.message);
   }
